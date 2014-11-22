@@ -1,0 +1,4 @@
+speedreader
+===========
+
+Speed reading extension
