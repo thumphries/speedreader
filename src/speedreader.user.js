@@ -298,6 +298,15 @@ function lightboxOverlay() {
     wpmVal.setAttribute("type","range");
     wpmVal.setAttribute("min",100);
     wpmVal.setAttribute("max",2000);
+    wpmVal.setAttribute("title", "Words Per Minute");
+    // var wpmDL= document.createElement("datalist");
+    // wmpSpan.appendChild(wpmDL);
+    // wpmDL.setAttribute("id","wpmDl");
+    // for(var i=0; i<4;i++){
+    //     $(wpmDL).append("<option value='"+ i*500+"'>");
+    // }
+    // $(wpmVal).attr("list", "wpmDl");
+
     $(wpmVal).val(settings.wpm);
     $(wpmVal).change(function(){
         settings.wpm= $(wpmVal).val();
@@ -320,6 +329,7 @@ function lightboxOverlay() {
     chunkSizeSlider.setAttribute("type","range");
     chunkSizeSlider.setAttribute("min",1);
     chunkSizeSlider.setAttribute("max",5);
+    chunkSizeSlider.setAttribute("title", "Chunk Size");
     $(chunkSizeSlider).val(settings.chunkSize);
     $(chunkSizeSlider).change(function(){
         var oldChunkSize = settings.chunkSize;
@@ -337,6 +347,8 @@ function lightboxOverlay() {
     var modeButton = document.createElement("span");
     modeButton.innerHTML = '\u2261';
     modeButton.setAttribute("id", "lb-mode");
+
+    modeButton.setAttribute("title", "View Mode");
     lbdiv.appendChild(modeButton);
     controlCnt.appendChild(controls);
     lbdiv.appendChild(controlCnt);
@@ -356,6 +368,7 @@ function lightboxOverlay() {
     // exitButton
     var exButton = document.createElement("span");
     exButton.innerHTML = '\u00d7';
+    exButton.setAttribute("title", "Close");
     exButton.setAttribute("id", "lb-exit");
     lbdiv.appendChild(exButton);
 
