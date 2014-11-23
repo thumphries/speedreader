@@ -272,6 +272,12 @@ function lightboxOverlay() {
     controlCnt.setAttribute("id", "lb-controls");
 
     //wpm slider
+    var wmpSpan= document.createElement("span");
+    wmpSpan.setAttribute("id","wmpSpan");
+    var wmpLabel = document.createElement("label");
+    $(wmpLabel).text("Words per minute:");
+    wmpSpan.appendChild(wmpLabel);
+
     var wpmVal = document.createElement("input");
     wpmVal.setAttribute("id","lb-wpm");
     wpmVal.setAttribute("type","range");
@@ -283,10 +289,17 @@ function lightboxOverlay() {
         clearInterval(state.interval);
         goRead();
     });
-    controls.appendChild(wpmVal);
-    controlCnt.appendChild(controls);
+    wmpSpan.appendChild(wpmVal);
+    controls.appendChild(wmpSpan);
 
-    // chunk size slider
+
+    //chunk size
+    var chunkSpan= document.createElement("span");
+    chunkSpan.setAttribute("id","chunkSpan");
+    var chunkLabel = document.createElement("label");
+    $(chunkLabel).text("Chunk Size:");
+    chunkSpan.appendChild(chunkLabel);
+
     var chunkSizeSlider = document.createElement("input");
     chunkSizeSlider.setAttribute("id","lb-chunks");
     chunkSizeSlider.setAttribute("type","range");
@@ -300,9 +313,8 @@ function lightboxOverlay() {
         var newStateIdx= Math.floor((state.idx*oldChunkSize)/settings.chunkSize);
         speedRead(state.rangeStr, newStateIdx);
     });
-
-    controls.appendChild(ppButton);
-    controls.appendChild(chunkSizeSlider);
+    chunkSpan.appendChild(chunkSizeSlider);
+    controls.appendChild(chunkSpan);
 
     // mode
     var modeButton = document.createElement("span");
