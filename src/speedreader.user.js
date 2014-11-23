@@ -44,22 +44,10 @@ function speedRead(s) {
     if(curWord==null){
       clearInterval(myVar);
     }
-
-    // var wordArr= ssplit(" ");
-    // if(wordArr.length !=0){
-    //   var i=0;
-    //   var curWord= wordArr[i];
-    //
-    //   while(curWord!=null){
-    //     alert(curWord);
-    //     curWord= wordArr[i++];
-    //   }
-    //   clearInterval(myVar);
-    // }
   }
   function getWordTime(wpm, numWords){
-    // alert(60000/numWords);
-    return 60000/numWords;
+
+    return 60000/wpm;
   }
 }
 
