@@ -197,7 +197,7 @@ function lightboxStyle() {
 	'}' +
 	'#lb-exit {' +
 	' position: fixed; top: 1em; left: 1em;' +
-	' color: #DDD; font-size: 2em;' +
+	' color: #DDD; font-size: 3em;' +
         '}' +
 	'#lb-exit:hover { color: #FFF; cursor: pointer;}' +
 	'#lb-pp {' +
@@ -208,20 +208,25 @@ function lightboxStyle() {
 	' color: #FFF; cursor: pointer;' +
 	'}' +
 	'#lb-mode {' +
-	' color: #FFF; font-size: 2em;' +
+	' color: #DDD; font-size: 3em;' +
 	' position: fixed; left: 1em; bottom: 1em;' +
 	'}' +
+	'#lb-mode:hover {' +
+	' color: #FFF; cursor: pointer;' +
+        '}' +
 	'#lb-controls {' +
-	' position: fixed; bottom: 1em; width: 50%; max-height: 15%;' +
+	' position: fixed; bottom: 3em; width: 50%; max-height: 15%;' +
 	' margin-left: 25%; margin-right: 25%;' +
 	'}' +
 	'#lb-controls-inner {' +
 	' width: auto; margin-left: auto; margin-right: auto;' +
+	' background-color: #333;' +
+	' border-radius: 0.5em;' +
 	'}' +
 	'#sp-read {' +
 	'}'+
         "#lb-timeRem{"+
-        " color: white; font-size: 2em;"+
+        " color: white; font-size: 3em;"+
         " font-style: bold;"+
 	' position: fixed; right: 1em; bottom: 1em;' +
 	'}' +
