@@ -67,11 +67,11 @@ function speedRead(s) {
             scrollPos = top;
         }
     }
+  }
+  function getWordTime(wpm, numWords){
 
-    function getWordTime(wpm, numWords){
-        return 60000/wpm;
-    }
-
+    return 60000/wpm;
+  }
 }
 
 function lightboxStyle() {
