@@ -8,8 +8,13 @@
 // ==/UserScript==
 
 var settings = {
-    wpm: 400,
-    chunk: 1,
+    wpm: 200,
+    chunkSize: 4,
+};
+
+var constants= {
+    msInSec: 60000,
+    engAvgWordLen: 5.1
 };
 
 // Spawn floating button until we start to bundle
@@ -39,7 +44,12 @@ function speedRead(s) {
     s = s.replace("\n\n", "<br/>");
     s = s.replace("\n", " ");
 
-    var wordArr = s.split(" ");
+    //create regex for chunking
+    var pattern = /[^ ]+/g;
+    if(settings.chunkSize>1){
+        pattern = new RegExp("([^ ]+\\s+){"+settings.chunkSize+"}","g");
+    }
+    var wordArr = s.match(pattern);
 
     var i=0;
     var curWord= wordArr[i];
@@ -73,7 +83,7 @@ function speedRead(s) {
 
 	if (top == 0) $('#lb-content').scrollTop(0);
 	if (top < 0) {
-            $('#lb-content').scrollTop(scroll + top); 
+            $('#lb-content').scrollTop(scroll + top);
 	}
 	if (top >= 300) {
             $('#lb-content').scrollTop(scroll + 230);
@@ -81,7 +91,7 @@ function speedRead(s) {
     }
 
     function getWordTime(wpm, numWords){
-      return 60000/wpm;
+      return constants.msInSec/wpm;
     }
 }
 
