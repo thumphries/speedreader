@@ -186,6 +186,7 @@ function lightboxStyle() {
     css.innerHTML =
     '#lightbox {' +
 	' position: fixed; top:0; left:0; width: 100%; height: 100%;' +
+    "box-shadow: 10px 10px 5px #888888;"+
 	' background-color: black;' +
     "font: 12px arial, sans-serif;"+
 	' display: none;' +
@@ -225,17 +226,22 @@ function lightboxStyle() {
 	'}' +
 	'#lb-controls {' +
     'background:#333;'+
-	' position: fixed; bottom: 0; left: 0; width: 80%; max-height: 15%;' +
+	'bottom: 0; left: 0; width: 80%; max-height: 15%;' +
 	' margin-left: 10%; margin-right: 10%;' +
     'border-radius: 10px'+
+    "display:inline;"+
 	'}' +
 	'#sp-read {' +
 	'}'+
-        "#lb-timeRem{"+
-        " color: white;"+
-        " font-style: bold;"+
-        " height:100px;"+
-        "}";
+    "#lb-timeRem{"+
+    " color: white;"+
+    " font-style: bold;"+
+    " height:100px;"+
+    "}"+
+    "#chunkSpan{"+
+    "display:inline-block;"
+    "}";
+
     return css;
 }
 function updateRemTime(){
@@ -270,6 +276,12 @@ function lightboxOverlay() {
     controls.appendChild(ppButton);
 
     //wpm slider
+    var wmpSpan= document.createElement("span");
+    wmpSpan.setAttribute("id","wmpSpan");
+    var wmpLabel = document.createElement("label");
+    $(wmpLabel).text("Words per minute:");
+    wmpSpan.appendChild(wmpLabel);
+
     var wpmVal = document.createElement("input");
     wpmVal.setAttribute("id","lb-wpm");
     wpmVal.setAttribute("type","range");
@@ -281,9 +293,17 @@ function lightboxOverlay() {
         clearInterval(state.interval);
         goRead();
     });
-    controls.appendChild(wpmVal);
+    wmpSpan.appendChild(wpmVal);
+    controls.appendChild(wmpSpan);
 
-    //chunk size slider
+
+    //chunk size
+    var chunkSpan= document.createElement("span");
+    chunkSpan.setAttribute("id","chunkSpan");
+    var chunkLabel = document.createElement("label");
+    $(chunkLabel).text("Chunk Size:");
+    chunkSpan.appendChild(chunkLabel);
+
     var chunkSizeSlider = document.createElement("input");
     chunkSizeSlider.setAttribute("id","lb-chunks");
     chunkSizeSlider.setAttribute("type","range");
@@ -297,7 +317,8 @@ function lightboxOverlay() {
         var newStateIdx= Math.floor((state.idx*oldChunkSize)/settings.chunkSize);
         speedRead(state.rangeStr, newStateIdx);
     });
-    controls.appendChild(chunkSizeSlider);
+    chunkSpan.appendChild(chunkSizeSlider);
+    controls.appendChild(chunkSpan);
 
     //mode
     var modeButton = document.createElement("span");
