@@ -8,7 +8,7 @@
 // ==/UserScript==
 
 var settings = {
-    wpm: 400,
+    wpm: 600,
     chunk: 1,
 };
 
@@ -68,20 +68,16 @@ function speedRead(s) {
         var top = $('#curword').position().top;
 	var scroll = $('#lb-content').scrollTop();
 
-	console.log(top.toString() + " <-> " + $('#lb-content').scrollTop().toString() + " <-> " + ($('#lb-content').scrollTop() - top).toString());
-	console.log($('#curword').scrollTop().toString());
-
 	if (top == 0) $('#lb-content').scrollTop(0);
-	if (top < 0) {
-            $('#lb-content').scrollTop(scroll + top); 
-	}
-	if (top >= 300) {
+	else if (top < 0) {
+            $('#lb-content').scrollTop(scroll + top);
+	} else if (top >= 300) {
             $('#lb-content').scrollTop(scroll + 230);
 	}
     }
 
     function getWordTime(wpm, numWords){
-      return 60000/wpm;
+        return 60000/wpm;
     }
 }
 
@@ -93,18 +89,19 @@ function lightboxStyle() {
 	' position: fixed; top:0; left:0; width: 100%; height: 100%;' +
 	' background-color: black;' +
 	' display: none;' +
-	' overflow: scroll;' +
+	' overflow: hidden;' +
 	'}' +
 	'#lb-content {' +
 	' color: black;' +
-	' max-height: 90%;' +
-	' width: 20em;' +
+	' min-height: 80%; max-width: 100%; max-height: 80%;' +
 	' font-size: 2em;' +
 	' white-space: normal;' +
 	' text-align: justify;' +
-	' margin-top: 3em; margin-bottom: 3em;' +
+	' padding-top: 3em;' +
 	' margin-left: auto; margin-right: auto;' +
-	' overflow: scroll;' +
+	' padding-left: 5em; padding-right: 5em;' +
+	' overflow-y: scroll; overflow-x: hidden;' +
+	' word-wrap: break-word;' +
 	'}';
     return css;
 }
