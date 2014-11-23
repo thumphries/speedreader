@@ -10,6 +10,7 @@
 var settings = {
     wpm: 600,
     chunkSize: 2,
+    centred: false,
 };
 
 var state = {
@@ -60,6 +61,14 @@ function speedRead(s) {
 }
 
 function goRead () {
+    if (settings.centred) {
+	$("#lb-content").hide();
+        $("#lb-centred").show();
+    } else {
+        $("#lb-centred").hide();
+        $("#lb-content").show();
+    }
+
     state.running = true;
     var curWord = state.wordArr[state.idx];
 
@@ -74,7 +83,10 @@ function goRead () {
 	if (old==null){
             clearInterval(state.interval);
 	    state.interval = {};
-	    $('#lb-content').html(whitespan + wordArr.join(" ") + endspan);
+	    // We want justified style on halt
+            $('#lb-centred').hide();
+	    $('#lb-content').show();
+ 	    $('#lb-content').html(whitespan + wordArr.join(" ") + endspan);
 	    state.running = false;
 
 	    // Reset idx and scroll
@@ -84,7 +96,11 @@ function goRead () {
         }
 
 	wordArr[pos] = whitespan+old+endspan;
-        $('#lb-content').html(wordArr.join(" "));
+        if (!settings.centred) {
+            $('#lb-content').html(wordArr.join(" "));
+	} else {
+            $('#lb-centred').html(whitespan + wordArr[pos] + endspan);
+	}
         wordArr[pos]=old;
 
 
@@ -121,7 +137,7 @@ function lightboxStyle() {
 	' display: none;' +
 	' overflow: hidden;' +
 	'}' +
-	'#lb-content {' +
+	'#lb-content, #lb-centred {' +
 	' color: black;' +
 	' min-height: 65%; max-width: 100%; max-height: 65%;' +
 	' font-size: 2em;' +
@@ -132,6 +148,10 @@ function lightboxStyle() {
 	' padding-left: 5em; padding-right: 5em;' +
 	' overflow-y: scroll; overflow-x: hidden;' +
 	' word-wrap: break-word;' +
+	'}' +
+	'#lb-centred {' +
+	' display: none; text-align: center;' +
+	' padding-top: auto; padding-bottom: auto;' +
 	'}' +
 	'#lb-exit {' +
 	' position: fixed; top: 15; left: 15;' +
@@ -144,6 +164,9 @@ function lightboxStyle() {
 	'}' +
 	'#lb-pp:hover {' +
 	' color: #FFF; cursor: pointer;' +
+	'}' +
+	'#lb-mode {' +
+	' color: #FFF; font-size: 2em;' +
 	'}' +
 	'#lb-controls {' +
 	' position: fixed; bottom: 0; left: 0; width: 50%; max-height: 15%;' +
@@ -158,13 +181,24 @@ function lightboxOverlay() {
     var content = document.createElement("div");
     content.setAttribute("id", "lb-content");
     lbdiv.appendChild(content);
+    var centred = document.createElement("div");
+    centred.setAttribute("id", "lb-centred");
+    lbdiv.appendChild(centred);
+
     var controls = document.createElement("div");
     controls.setAttribute("id", "lb-controls");
     var ppButton = document.createElement("span");
     ppButton.innerHTML = '\u275A \u275A';
     ppButton.setAttribute("id", "lb-pp");
     controls.appendChild(ppButton);
+
+    var modeButton = document.createElement("span");
+    modeButton.innerHTML = 'C';
+    modeButton.setAttribute("id", "lb-mode");
+    controls.appendChild(modeButton);
+
     lbdiv.appendChild(controls);
+
     var exButton = document.createElement("span");
     exButton.innerHTML = '\u00d7';
     exButton.setAttribute("id", "lb-exit");
@@ -180,13 +214,30 @@ function lightbox () {
 	pauseRead();
         $('#lightbox').hide();
     });
-    $('#lb-pp').on("click", function() {
+
+    var pp = function() {
         if(state.running) {
 	    pauseRead();
 	    $('#lb-pp').html('\u25B6');
 	} else {
             goRead();
 	    $('#lb-pp').html('\u275A \u275A');
-	} 
-    });
+	}
+    };
+
+    var chm = function() {
+        if(settings.centred) {
+            $("#lb-centred").hide();
+	    $("#lb-content").show();
+	    settings.centred = false;
+	} else {
+	    $("#lb-content").hide();
+	    $("#lb-centred").show();
+	    settings.centred = true;
+	}
+    }
+
+    $('#lb-pp').on("click", pp);
+    $('#lb-content').on("click", pp);
+    $('#lb-mode').on("click", chm);
 }
