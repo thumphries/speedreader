@@ -201,8 +201,9 @@ function lightboxStyle() {
         '}' +
 	'#lb-exit:hover { color: #FFF; cursor: pointer;}' +
 	'#lb-pp {' +
-	' font-size: 3em; width: 20%;' +
-	' color: #DDD; letter-spacing: -0.15em;' +
+	' font-size: 3em; width: 15%; margin-left: auto; margin-right: auto;' +
+	' clear: none;' +
+	' color: #DDD; letter-spacing: -0.15;' +
 	'}' +
 	'#lb-pp:hover {' +
 	' color: #FFF; cursor: pointer;' +
@@ -219,9 +220,10 @@ function lightboxStyle() {
 	' margin-left: 25%; margin-right: 25%;' +
 	'}' +
 	'#lb-controls-inner {' +
-	' width: auto; margin-left: auto; margin-right: auto;' +
+	' width: 100%; margin-left: auto; margin-right: auto;' +
 	' background-color: #333;' +
 	' border-radius: 0.5em;' +
+	' column-count: 3;' +
 	'}' +
 	'#sp-read {' +
 	'}'+
@@ -230,11 +232,16 @@ function lightboxStyle() {
         " font-style: bold;"+
 	' position: fixed; right: 1em; bottom: 1em;' +
 	'}' +
-	'#lb-wpm {' +
-	' width: 40%;' +
+	'#wmpSpan, #chunkSpan {' +
+	' width: 40%; height: 100%;' +
+	' color: #DDD; font-size: 1.2em;' +
+	' padding-top: 0.5em;' +
 	'}' +
-	'#lb-chunks {' +
-	' width: 40%;' +
+	'#wmpSpan { float: left; }' +
+	'#chunkSpan { float: right; }' +
+	'#wmpSpan span, #chunkSpan label {' +
+	' padding-top: auto; padding-bottom: 1em;' +
+        //' width: 5em; padding-left: auto; margin-right: 2em;' +
 	'}';
     return css;
 }
@@ -264,7 +271,7 @@ function lightboxOverlay() {
     //controls
     var controls = document.createElement("div");
     controls.setAttribute("id", "lb-controls-inner");
-    var ppButton = document.createElement("span");
+    var ppButton = document.createElement("div");
     ppButton.innerHTML = '\u275A \u275A';
     ppButton.setAttribute("id", "lb-pp");
 
@@ -272,10 +279,10 @@ function lightboxOverlay() {
     controlCnt.setAttribute("id", "lb-controls");
 
     //wpm slider
-    var wmpSpan= document.createElement("span");
+    var wmpSpan= document.createElement("div");
     wmpSpan.setAttribute("id","wmpSpan");
     var wmpLabel = document.createElement("label");
-    $(wmpLabel).text("Words per minute:");
+    $(wmpLabel).text("WPM");
     wmpSpan.appendChild(wmpLabel);
 
     var wpmVal = document.createElement("input");
@@ -289,16 +296,15 @@ function lightboxOverlay() {
         clearInterval(state.interval);
         goRead();
     });
+    // Good lord this is spaghetti - take care when reordering
     wmpSpan.appendChild(wpmVal);
     controls.appendChild(wmpSpan);
 
-
     //chunk size
-    var chunkSpan= document.createElement("span");
+    var chunkSpan= document.createElement("div");
     chunkSpan.setAttribute("id","chunkSpan");
     var chunkLabel = document.createElement("label");
-    $(chunkLabel).text("Chunk Size:");
-    chunkSpan.appendChild(chunkLabel);
+    $(chunkLabel).text("Chunk");
 
     var chunkSizeSlider = document.createElement("input");
     chunkSizeSlider.setAttribute("id","lb-chunks");
@@ -314,13 +320,16 @@ function lightboxOverlay() {
         speedRead(state.rangeStr, newStateIdx);
     });
     chunkSpan.appendChild(chunkSizeSlider);
+    chunkSpan.appendChild(chunkLabel);
     controls.appendChild(chunkSpan);
+    controls.appendChild(ppButton);
 
     // mode
     var modeButton = document.createElement("span");
     modeButton.innerHTML = '\u2261';
     modeButton.setAttribute("id", "lb-mode");
     lbdiv.appendChild(modeButton);
+    controlCnt.appendChild(controls);
     lbdiv.appendChild(controlCnt);
 
     // time remaining
