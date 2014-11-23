@@ -37,7 +37,14 @@ lightbox();
 
 function processSelection () {
     var selObj = window.getSelection();
-    var range = selObj.getRangeAt(0);
+    var range;
+    if (selObj.toString() == "") {
+        // Select whole page
+	range = document.createRange();
+	range.selectNode(document.getElementsByTagName("body").item(0));
+    } else {
+        range = selObj.getRangeAt(0);
+    }
 
     speedRead(range.toString());
 }
@@ -176,7 +183,7 @@ function lightboxStyle() {
 	'}' +
 	'#lb-centred {' +
 	' display: none; text-align: center;' +
-	' padding-top: auto; padding-bottom: auto;' +
+	' padding-top: 8em; padding-bottom: auto;' +
 	'}' +
 	'#lb-exit {' +
 	' position: fixed; top: 15; left: 15;' +
@@ -275,5 +282,6 @@ function lightbox () {
 
     $('#lb-pp').on("click", pp);
     $('#lb-content').on("click", pp);
+    $('#lb-centred').on("click", pp);
     $('#lb-mode').on("click", chm);
 }
