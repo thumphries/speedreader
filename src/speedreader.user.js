@@ -2,6 +2,7 @@
 // @name       Speed Reader
 // @namespace  http://github.com/shelf/speedreader
 // @version    0.1
+// @require       http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @description  Fascinating speed reading tool
 // @match      http://*/*
 // @copyright  2014+, T. Humphries, S. Ruji
@@ -29,7 +30,8 @@ var state = {
 var button = document.createElement("a");
 button.innerHTML = "Speed read selection";
 button.setAttribute("href", "#");
-button.setAttribute("onclick", "processSelection(); return false;")
+//button.setAttribute("onclick", "processSelection(); return false;")
+button.onclick = processSelection;
 button.setAttribute("style", "position: fixed; right: 0; left: auto;");
 document.body.insertBefore(button, document.body.firstChild);
 
@@ -168,7 +170,7 @@ function lightboxStyle() {
 	' overflow: hidden;' +
 	'}' +
 	'#lb-content, #lb-centred {' +
-	' color: black;' +
+	' color: #333;' +
 	' min-height: 65%; max-width: 100%; max-height: 65%;' +
 	' font-size: 2em;' +
 	' white-space: normal;' +
