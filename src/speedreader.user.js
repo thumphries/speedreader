@@ -224,8 +224,10 @@ function lightboxStyle() {
 	' color: #FFF; font-size: 2em;' +
 	'}' +
 	'#lb-controls {' +
-	' position: fixed; bottom: 0; left: 0; width: 50%; max-height: 15%;' +
-	' margin-left: auto; margin-right: auto;' +
+    'background:#333;'+
+	' position: fixed; bottom: 0; left: 0; width: 80%; max-height: 15%;' +
+	' margin-left: 10%; margin-right: 10%;' +
+    'border-radius: 10px'+
 	'}' +
 	'#sp-read {' +
 	'}'+
