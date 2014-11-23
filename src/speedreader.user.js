@@ -38,7 +38,6 @@ document.body.insertBefore(button, document.body.firstChild);
 lightbox();
 
 function aaaaaa () {
-    alert("what the shit");
     var fun = processSelection;
     processSelection();
     return false;
@@ -57,6 +56,7 @@ function processSelection () {
     state.rangeStr= range.toString();
     speedRead(range.toString(), 0);
 }
+
 function initWordArr(s){
     // Dreadful hacky munge
     s = s.replace("\n\n", "<br/>");
@@ -69,6 +69,7 @@ function initWordArr(s){
     }
     return s.match(pattern);
 }
+
 function speedRead(s, startIdx) {
     $('#lb-content').html(s);
     $('#lightbox').show();
@@ -91,8 +92,6 @@ function goRead () {
 
     state.running = true;
     var curWord = state.wordArr[state.idx];
-    // var whitespan = "<span id=\"curWord\" style='color:white;'>";
-    // var endspan = "</span>";
 
     iterate(state.wordArr, state.idx);
     state.idx++;
@@ -100,8 +99,6 @@ function goRead () {
     state.interval = setInterval(function(){
         iterate(state.wordArr, state.idx); state.idx++;
     }, getWordTime());
-
-
 
     function iterate(wordArr, pos) {
         var old= wordArr[pos];
@@ -120,30 +117,40 @@ function goRead () {
     	    // Reset idx and scroll
     	    $("#lb-pp").html('\u27f2');
     	    state.idx = 0;
-        }else{
-        	wordArr[pos] = whiteSpan+old+endSpan;
-                if (!settings.centred) {
-                    $('#lb-content').html(wordArr.join(" "));
-        	} else {
-                    $('#lb-centred').html(whiteSpan + wordArr[pos] + endSpan);
-        	}
+        } else {
+            wordArr[pos] = whiteSpan+old+endSpan;
+            if (!settings.centred) {
+                $('#lb-content').html(wordArr.join(" "));
+            } else {
+                $('#lb-centred').html(whiteSpan + wordArr[pos] + endSpan);
+	    }
+
             wordArr[pos]=old;
 
-
-
-        	if (top < 0) {
+	    var cw = $('#curword');
+	    var pos = cw.position();
+            if (!cw || pos === undefined ||
+	        (cw && pos !== undefined && pos.top == 0)) {
+                 $('#lb-content').scrollTop(0);
+	    } else {
+                var top = pos.top;
+       	        var scroll = $('#lb-content').scrollTop();
+      	        if (top < 0) {
                     $('#lb-content').scrollTop(scroll + top);
-        	}
-        	if (top >= 300) {
+      	        }
+      	        if (top >= 300) {
                     $('#lb-content').scrollTop(scroll + 230);
-        	}
-        }
+      	        }
+            }
+	}
     }
 }
+
 function getWordTime(){
     var adjustedTime = settings.wpm/ settings.chunkSize
     return constants.msInSec/adjustedTime;
 }
+
 function resetInterval(){
     clearInterval(state.interval);
     goRead();
@@ -183,6 +190,7 @@ function lightboxStyle() {
     "font: 12px arial, sans-serif;"+
 	' display: none;' +
 	' overflow: hidden;' +
+	//' z-index: 9999999;' +
 	'}' +
 	'#lb-content, #lb-centred {' +
 	' color: #333;' +
@@ -195,6 +203,7 @@ function lightboxStyle() {
 	' padding-left: 5em; padding-right: 5em;' +
 	' overflow-y: scroll; overflow-x: hidden;' +
 	' word-wrap: break-word;' +
+	//' z-index: 99999999;'
 	'}' +
 	'#lb-centred {' +
 	' display: none; text-align: center;' +
@@ -203,11 +212,13 @@ function lightboxStyle() {
 	'#lb-exit {' +
 	' position: fixed; top: 15; left: 15;' +
 	' color: #DDD; font-size: 2em;' +
+	//' z-index: 999999999;' +
         '}' +
 	'#lb-exit:hover { color: #FFF; cursor: pointer;}' +
 	'#lb-pp {' +
 	' font-size: 3em; width: 6em;' +
 	' color: #DDD; letter-spacing: -0.15em;' +
+	//' z-index: inherit;' +
 	'}' +
 	'#lb-pp:hover {' +
 	' color: #FFF; cursor: pointer;' +
@@ -218,9 +229,10 @@ function lightboxStyle() {
 	'#lb-controls {' +
 	' position: fixed; bottom: 0; left: 0; width: 50%; max-height: 15%;' +
 	' margin-left: auto; margin-right: auto;' +
+	//' z-index: 9999999; ' +
 	'}' +
 	'#sp-read {' +
-	' z-index: 999999;' +
+	//' z-index: 999999;' +
 	'}'+
         "#lb-timeRem{"+
         " color: white;"+
