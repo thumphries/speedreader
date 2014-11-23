@@ -34,13 +34,14 @@ function lightboxStyle() {
     css.innerHTML =
 	'#lightbox {' +
 	' position: fixed; top:0; left:0; width: 100%; height: 100%;' +
-	' background-color: black; text-align: center;' +
+	' background-color: black;' +
 	' display: none;' +
-	' overflow: visible;' +
+	' overflow: scroll;' +
 	'}' +
 	'#lb-content {' +
-	' max-width: 90%;' +
 	' color: white;' +
+	' max-height: 90%;' +
+	' width: 90%;' +
 	' white-space: pre-wrap;' +
 	' text-align: justify;' +
 	' margin-left: auto; margin-right: auto;' +
