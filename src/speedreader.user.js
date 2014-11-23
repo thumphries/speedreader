@@ -93,7 +93,7 @@ function lightboxStyle() {
 	'}' +
 	'#lb-content {' +
 	' color: black;' +
-	' min-height: 80%; max-width: 100%; max-height: 80%;' +
+	' min-height: 65%; max-width: 100%; max-height: 65%;' +
 	' font-size: 2em;' +
 	' white-space: normal;' +
 	' text-align: justify;' +
