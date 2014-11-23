@@ -9,8 +9,8 @@
 // ==/UserScript==
 
 var settings = {
-    wpm: 600,
-    chunkSize: 3,
+    wpm: 100,
+    chunkSize: 4,
     centred: false,
 };
 
@@ -84,7 +84,9 @@ function goRead () {
     state.running = true;
     var curWord = state.wordArr[state.idx];
 
-    state.interval = setInterval(function(){iterate(state.wordArr, state.idx); state.idx++;}, getWordTime(settings.wpm, state.wordArr.length));
+    state.interval = setInterval(function(){
+        iterate(state.wordArr, state.idx); state.idx++;
+    }, getWordTime(settings.wpm / settings.chunkSize, state.wordArr.length));
 
     var whitespan = "<span id=\"curword\" style='color:white;'>";
     var endspan = "</span>";
@@ -228,6 +230,11 @@ function lightboxOverlay() {
     ppButton.innerHTML = '\u275A \u275A';
     ppButton.setAttribute("id", "lb-pp");
     controls.appendChild(ppButton);
+    //slider
+    var slider = document.createElement("div");
+    $(slider).slider();
+    controls.appendChild(slider);
+
 
     var modeButton = document.createElement("span");
     modeButton.innerHTML = 'C';
