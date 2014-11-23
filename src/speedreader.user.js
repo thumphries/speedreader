@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 var settings = {
-    wpm: 100,
+    wpm: 600,
     chunkSize: 4,
     centred: false,
 };
