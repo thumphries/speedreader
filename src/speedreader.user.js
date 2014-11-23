@@ -27,21 +27,7 @@ var state = {
     remTime:0,
 };
 
-// Spawn floating button until we start to bundle
-var button = document.createElement("a");
-button.innerHTML = "Speed read selection";
-button.setAttribute("id", "sp-read");
-button.onclick = aaaaaa;
-button.setAttribute("style", "position: fixed; right: 0; left: auto;");
-document.body.insertBefore(button, document.body.firstChild);
-
 lightbox();
-
-function aaaaaa () {
-    var fun = processSelection;
-    processSelection();
-    return false;
-}
 
 function processSelection () {
     var selObj = window.getSelection();
@@ -54,6 +40,7 @@ function processSelection () {
         range = selObj.getRangeAt(0);
     }
     state.rangeStr= range.toString();
+    $('#lb-pp').html('\u275A \u275A');
     speedRead(range.toString(), 0);
 }
 
@@ -186,7 +173,6 @@ function lightboxStyle() {
     css.innerHTML =
     '#lightbox {' +
 	' position: fixed; top:0; left:0; width: 100%; height: 100%;' +
-    "box-shadow: 10px 10px 5px #888888;"+
 	' background-color: black;' +
     "font: 12px arial, sans-serif;"+
 	' display: none;' +
@@ -210,38 +196,53 @@ function lightboxStyle() {
 	' padding-top: 8em; padding-bottom: auto;' +
 	'}' +
 	'#lb-exit {' +
-	' position: fixed; top: 15; left: 15;' +
-	' color: #DDD; font-size: 2em;' +
+	' position: fixed; top: 1em; left: 1em;' +
+	' color: #DDD; font-size: 3em;' +
         '}' +
 	'#lb-exit:hover { color: #FFF; cursor: pointer;}' +
 	'#lb-pp {' +
-	' font-size: 3em; width: 6em;' +
-	' color: #DDD; letter-spacing: -0.15em;' +
+	' font-size: 3em; width: 15%; margin-left: auto; margin-right: auto;' +
+	' clear: none;' +
+	' color: #DDD; letter-spacing: -0.15;' +
 	'}' +
 	'#lb-pp:hover {' +
 	' color: #FFF; cursor: pointer;' +
 	'}' +
 	'#lb-mode {' +
-	' color: #FFF; font-size: 2em;' +
+	' color: #DDD; font-size: 3em;' +
+	' position: fixed; left: 1em; bottom: 1em;' +
 	'}' +
+	'#lb-mode:hover {' +
+	' color: #FFF; cursor: pointer;' +
+        '}' +
 	'#lb-controls {' +
-    'background:#333;'+
-	'bottom: 0; left: 0; width: 80%; max-height: 15%;' +
-	' margin-left: 10%; margin-right: 10%;' +
-    'border-radius: 10px'+
-    "display:inline;"+
+	' position: fixed; bottom: 3em; width: 50%; max-height: 15%;' +
+	' margin-left: 25%; margin-right: 25%;' +
+	'}' +
+	'#lb-controls-inner {' +
+	' width: 100%; margin-left: auto; margin-right: auto;' +
+	' background-color: #333;' +
+	' border-radius: 0.5em;' +
+	' column-count: 3;' +
 	'}' +
 	'#sp-read {' +
 	'}'+
-    "#lb-timeRem{"+
-    " color: white;"+
-    " font-style: bold;"+
-    " height:100px;"+
-    "}"+
-    "#chunkSpan{"+
-    "display:inline-block;"
-    "}";
-
+        "#lb-timeRem{"+
+        " color: white; font-size: 3em;"+
+        " font-style: bold;"+
+	' position: fixed; right: 1em; bottom: 1em;' +
+	'}' +
+	'#wmpSpan, #chunkSpan {' +
+	' width: 40%; height: 100%;' +
+	' color: #DDD; font-size: 1.2em;' +
+	' padding-top: 0.5em;' +
+	'}' +
+	'#wmpSpan { float: left; }' +
+	'#chunkSpan { float: right; }' +
+	'#wmpSpan span, #chunkSpan label {' +
+	' padding-top: auto; padding-bottom: 1em;' +
+        //' width: 5em; padding-left: auto; margin-right: 2em;' +
+	'}';
     return css;
 }
 function updateRemTime(){
@@ -250,7 +251,7 @@ function updateRemTime(){
     var remTime= getWordTime()*settings.chunkSize*remIndexes;
     min = Math.floor((remTime/1000/60) << 0);
     //sec = Math.floor((remTime/1000) % 60);
-    var remTimeStr= min + " minute(s) remaining"; //+ ":"+ sec;
+    var remTimeStr= min + "m";
     $('#lb-timeRem').html(remTimeStr);
 }
 function lightboxOverlay() {
@@ -269,17 +270,19 @@ function lightboxOverlay() {
 
     //controls
     var controls = document.createElement("div");
-    controls.setAttribute("id", "lb-controls");
-    var ppButton = document.createElement("span");
+    controls.setAttribute("id", "lb-controls-inner");
+    var ppButton = document.createElement("div");
     ppButton.innerHTML = '\u275A \u275A';
     ppButton.setAttribute("id", "lb-pp");
-    controls.appendChild(ppButton);
+
+    var controlCnt = document.createElement("div");
+    controlCnt.setAttribute("id", "lb-controls");
 
     //wpm slider
-    var wmpSpan= document.createElement("span");
+    var wmpSpan= document.createElement("div");
     wmpSpan.setAttribute("id","wmpSpan");
     var wmpLabel = document.createElement("label");
-    $(wmpLabel).text("Words per minute:");
+    $(wmpLabel).text("WPM");
     wmpSpan.appendChild(wmpLabel);
 
     var wpmVal = document.createElement("input");
@@ -302,16 +305,15 @@ function lightboxOverlay() {
         clearInterval(state.interval);
         goRead();
     });
+    // Good lord this is spaghetti - take care when reordering
     wmpSpan.appendChild(wpmVal);
     controls.appendChild(wmpSpan);
 
-
     //chunk size
-    var chunkSpan= document.createElement("span");
+    var chunkSpan= document.createElement("div");
     chunkSpan.setAttribute("id","chunkSpan");
     var chunkLabel = document.createElement("label");
-    $(chunkLabel).text("Chunk Size:");
-    chunkSpan.appendChild(chunkLabel);
+    $(chunkLabel).text("Chunk");
 
     var chunkSizeSlider = document.createElement("input");
     chunkSizeSlider.setAttribute("id","lb-chunks");
@@ -328,23 +330,27 @@ function lightboxOverlay() {
         speedRead(state.rangeStr, newStateIdx);
     });
     chunkSpan.appendChild(chunkSizeSlider);
+    chunkSpan.appendChild(chunkLabel);
     controls.appendChild(chunkSpan);
+    controls.appendChild(ppButton);
 
-    //mode
+    // mode
     var modeButton = document.createElement("span");
-    modeButton.innerHTML = 'C';
+    modeButton.innerHTML = '\u2261';
     modeButton.setAttribute("id", "lb-mode");
-    modeButton.setAttribute("title", "View Mode");
-    controls.appendChild(modeButton);
-    lbdiv.appendChild(controls);
 
-    //time remaining
-    var timeRem = document.createElement("p");
+    modeButton.setAttribute("title", "View Mode");
+    lbdiv.appendChild(modeButton);
+    controlCnt.appendChild(controls);
+    lbdiv.appendChild(controlCnt);
+
+    // time remaining
+    var timeRem = document.createElement("span");
     timeRem.setAttribute("id","lb-timeRem");
     updateRemTime();
-    controls.appendChild(timeRem);
+    lbdiv.appendChild(timeRem);
 
-    //exitButton
+    // exitButton
     var exButton = document.createElement("span");
     exButton.innerHTML = '\u00d7';
     exButton.setAttribute("title", "Close");
@@ -377,10 +383,12 @@ function lightbox () {
             $("#lb-centred").hide();
 	    $("#lb-content").show();
 	    settings.centred = false;
+	    $("#lb-mode").html('\u2261');
 	} else {
 	    $("#lb-content").hide();
 	    $("#lb-centred").show();
 	    settings.centred = true;
+	    $("#lb-mode").html('\u2012');
 	}
     }
 
