@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 var settings = {
-    wpm: 600,
+    wpm: 100,
     chunkSize: 4,
     centred: false,
 };
@@ -47,14 +47,10 @@ function processSelection () {
     } else {
         range = selObj.getRangeAt(0);
     }
-
-    speedRead(range.toString());
+    state.rangeStr= range.toString();
+    speedRead(range.toString(), 0);
 }
-
-function speedRead(s) {
-    $('#lb-content').html(s);
-    $('#lightbox').show();
-
+function initWordArr(s){
     // Dreadful hacky munge
     s = s.replace("\n\n", "<br/>");
     s = s.replace("\n", " ");
@@ -64,10 +60,15 @@ function speedRead(s) {
     if(settings.chunkSize>1){
         pattern = new RegExp("([^ ]+\\s+){"+settings.chunkSize+"}","g");
     }
+    return s.match(pattern);
+}
+function speedRead(s, startIdx) {
+    $('#lb-content').html(s);
+    $('#lightbox').show();
 
-    state.wordArr = s.match(pattern);
+    state.wordArr = initWordArr(s);
 
-    state.idx = 0;
+    state.idx = startIdx;
 
     goRead ();
 }
@@ -83,58 +84,65 @@ function goRead () {
 
     state.running = true;
     var curWord = state.wordArr[state.idx];
+    // var whitespan = "<span id=\"curWord\" style='color:white;'>";
+    // var endspan = "</span>";
+
+    iterate(state.wordArr, state.idx);
+    state.idx++;
 
     state.interval = setInterval(function(){
         iterate(state.wordArr, state.idx); state.idx++;
-    }, getWordTime(settings.wpm / settings.chunkSize, state.wordArr.length));
+    }, getWordTime(settings.wpm, state.wordArr.length));
 
-    var whitespan = "<span id=\"curword\" style='color:white;'>";
-    var endspan = "</span>";
+
 
     function iterate(wordArr, pos) {
         var old= wordArr[pos];
+        var whiteSpan= "<span id=\"curword\" style='color:white;'>";
+        var endSpan = "</span>";
 
-	if (old==null){
+    	if (old==null){
             clearInterval(state.interval);
-	    state.interval = {};
-	    // We want justified style on halt
+    	    state.interval = {};
+    	    // We want justified style on halt
             $('#lb-centred').hide();
-	    $('#lb-content').show();
- 	    $('#lb-content').html(whitespan + wordArr.join(" ") + endspan);
-	    state.running = false;
+    	    $('#lb-content').show();
+     	    $('#lb-content').html(whiteSpan + wordArr.join(" ") + endSpan);
+    	    state.running = false;
 
-	    // Reset idx and scroll
-	    $("#lb-pp").html('\u27f2');
-	    state.idx = 0;
-	    return;
+    	    // Reset idx and scroll
+    	    $("#lb-pp").html('\u27f2');
+    	    state.idx = 0;
+        }else{
+        	wordArr[pos] = whiteSpan+old+endSpan;
+                if (!settings.centred) {
+                    $('#lb-content').html(wordArr.join(" "));
+        	} else {
+                    $('#lb-centred').html(whiteSpan + wordArr[pos] + endSpan);
+        	}
+            wordArr[pos]=old;
+
+            var top = $('#curword').position().top;
+        	var scroll = $('#lb-content').scrollTop();
+
+        	if (top == 0) $('#lb-content').scrollTop(0);
+
+        	if (top < 0) {
+                    $('#lb-content').scrollTop(scroll + top);
+        	}
+        	if (top >= 300) {
+                    $('#lb-content').scrollTop(scroll + 230);
+        	}
         }
-
-	wordArr[pos] = whitespan+old+endspan;
-        if (!settings.centred) {
-            $('#lb-content').html(wordArr.join(" "));
-	} else {
-            $('#lb-centred').html(whitespan + wordArr[pos] + endspan);
-	}
-        wordArr[pos]=old;
-
-
-
-        var top = $('#curword').position().top;
-    	var scroll = $('#lb-content').scrollTop();
-
-    	if (top == 0) $('#lb-content').scrollTop(0);
-
-    	if (top < 0) {
-                $('#lb-content').scrollTop(scroll + top);
-    	}
-    	if (top >= 300) {
-                $('#lb-content').scrollTop(scroll + 230);
-    	}
     }
-
-    function getWordTime(wpm, numWords){
-      return constants.msInSec/wpm;
-    }
+}
+function getWordTime(wpm,numWords){
+    var adjustedTime = wpm/ settings.chunkSize
+    return constants.msInSec/adjustedTime;
+}
+function resetInterval(){
+    clearInterval(state.interval);
+    goRead();
 }
 
 function pauseRead () {
@@ -205,7 +213,7 @@ function lightboxStyle() {
 	'#lb-controls {' +
 	' position: fixed; bottom: 0; left: 0; width: 50%; max-height: 15%;' +
 	' margin-left: auto; margin-right: auto;' +
-	'}';
+	'}'
     return css;
 }
 
@@ -231,16 +239,39 @@ function lightboxOverlay() {
     ppButton.setAttribute("id", "lb-pp");
     controls.appendChild(ppButton);
     //slider
-    var slider = document.createElement("div");
-    $(slider).slider();
-    controls.appendChild(slider);
+    var wpmVal = document.createElement("input");
+    wpmVal.setAttribute("id","lb-wpm");
+    wpmVal.setAttribute("type","range");
+    wpmVal.setAttribute("min",100);
+    wpmVal.setAttribute("max",2000);
+    $(wpmVal).val(settings.wpm);
+    $(wpmVal).change(function(){
+        settings.wpm= $(wpmVal).val();
+        clearInterval(state.interval);
+        goRead();
+    });
+    controls.appendChild(wpmVal);
 
+    var chunkSizeSlider = document.createElement("input");
+    chunkSizeSlider.setAttribute("id","lb-chunks");
+    chunkSizeSlider.setAttribute("type","range");
+    chunkSizeSlider.setAttribute("min",1);
+    chunkSizeSlider.setAttribute("max",5);
+    $(chunkSizeSlider).val(settings.wpm);
+    $(chunkSizeSlider).change(function(){
+        var oldChunkSize = settings.chunkSize;
+        settings.chunkSize= $(chunkSizeSlider).val();
+        clearInterval(state.interval);
+        var newStateIdx= Math.floor((state.idx*oldChunkSize)/settings.chunkSize);
+        speedRead(state.rangeStr, newStateIdx);
+        // pauseRead();
+    });
+    controls.appendChild(chunkSizeSlider);
 
     var modeButton = document.createElement("span");
     modeButton.innerHTML = 'C';
     modeButton.setAttribute("id", "lb-mode");
     controls.appendChild(modeButton);
-
     lbdiv.appendChild(controls);
 
     //exitButton
