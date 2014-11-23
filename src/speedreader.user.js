@@ -181,7 +181,7 @@ function lightboxStyle() {
 	' z-index: 9999999;' +
 	'}' +
 	'#lb-content, #lb-centred {' +
-	' color: #333;' +
+	' color: #151515;' +
 	' min-height: 65%; max-width: 100%; max-height: 65%;' +
 	' font-size: 2em;' +
 	' white-space: normal;' +
