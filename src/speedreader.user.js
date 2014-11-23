@@ -102,7 +102,12 @@ function lightboxStyle() {
 	' padding-left: 5em; padding-right: 5em;' +
 	' overflow-y: scroll; overflow-x: hidden;' +
 	' word-wrap: break-word;' +
-	'}';
+	'}' +
+	'#lb-exit {' +
+	' position: fixed; top: 15; left: 15;' +
+	' color: #DDD; font-size: 2em;' +
+        '}' +
+	'#lb-exit:hover { color: #FFF; cursor: pointer;}';
     return css;
 }
 
@@ -112,13 +117,17 @@ function lightboxOverlay() {
     var content = document.createElement("div");
     content.setAttribute("id", "lb-content");
     lbdiv.appendChild(content);
+    var exButton = document.createElement("span");
+    exButton.innerHTML = '\u00d7';
+    exButton.setAttribute("id", "lb-exit");
+    lbdiv.appendChild(exButton);
     return lbdiv;
 }
 
 function lightbox () {
     document.body.appendChild(lightboxStyle());
     document.body.appendChild(lightboxOverlay());
-    $('#lightbox').on("click", function() {
+    $('#lb-exit').on("click", function() {
 	clearInterval(interval);
         $('#lightbox').hide();
     });
