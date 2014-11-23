@@ -17,6 +17,13 @@ var constants= {
     engAvgWordLen: 5.1
 };
 
+var state = {
+    running: false,
+    interval: {},
+    wordArr: [],
+    idx: 0,
+};
+
 // Spawn floating button until we start to bundle
 var button = document.createElement("a");
 button.innerHTML = "Speed read selection";
@@ -26,8 +33,6 @@ button.setAttribute("style", "position: fixed; right: 0; left: auto;");
 document.body.insertBefore(button, document.body.firstChild);
 
 lightbox();
-
-var interval;
 
 function processSelection () {
     var selObj = window.getSelection();
@@ -49,13 +54,19 @@ function speedRead(s) {
     if(settings.chunkSize>1){
         pattern = new RegExp("([^ ]+\\s+){"+settings.chunkSize+"}","g");
     }
-    var wordArr = s.match(pattern);
 
-    var i=0;
-    var curWord= wordArr[i];
+    state.wordArr = s.match(pattern);
 
-    var scrollPos = 0;
-    interval = setInterval(function(){iterate(wordArr, i); i++;}, getWordTime(settings.wpm, wordArr.length));
+    state.idx = 0;
+
+    goRead ();
+}
+
+function goRead () {
+    state.running = true;
+    var curWord = state.wordArr[state.idx];
+
+    state.interval = setInterval(function(){iterate(state.wordArr, state.idx); state.idx++;}, getWordTime(settings.wpm, state.wordArr.length));
 
     var whitespan = "<span id=\"curword\" style='color:white;'>";
     var endspan = "</span>";
@@ -64,8 +75,14 @@ function speedRead(s) {
         var old= wordArr[pos];
 
 	if (old==null){
-            clearInterval(interval);
+            clearInterval(state.interval);
+	    state.interval = {};
 	    $('#lb-content').html(whitespan + wordArr.join(" ") + endspan);
+	    state.running = false;
+
+	    // Reset idx and scroll
+	    $("#lb-pp").html('\u27f2');
+	    state.idx = 0;
 	    return;
         }
 
@@ -76,23 +93,27 @@ function speedRead(s) {
 
 
         var top = $('#curword').position().top;
-	var scroll = $('#lb-content').scrollTop();
+    	var scroll = $('#lb-content').scrollTop();
 
-	console.log(top.toString() + " <-> " + $('#lb-content').scrollTop().toString() + " <-> " + ($('#lb-content').scrollTop() - top).toString());
-	console.log($('#curword').scrollTop().toString());
+    	if (top == 0) $('#lb-content').scrollTop(0);
 
-	if (top == 0) $('#lb-content').scrollTop(0);
-	if (top < 0) {
-            $('#lb-content').scrollTop(scroll + top);
-	}
-	if (top >= 300) {
-            $('#lb-content').scrollTop(scroll + 230);
-	}
+    	if (top < 0) {
+                $('#lb-content').scrollTop(scroll + top);
+    	}
+    	if (top >= 300) {
+                $('#lb-content').scrollTop(scroll + 230);
+    	}
     }
 
     function getWordTime(wpm, numWords){
       return constants.msInSec/wpm;
     }
+}
+
+function pauseRead () {
+    clearInterval(state.interval);
+    state.interval = {};
+    state.running = false;
 }
 
 function lightboxStyle() {
@@ -103,18 +124,35 @@ function lightboxStyle() {
 	' position: fixed; top:0; left:0; width: 100%; height: 100%;' +
 	' background-color: black;' +
 	' display: none;' +
-	' overflow: scroll;' +
+	' overflow: hidden;' +
 	'}' +
 	'#lb-content {' +
 	' color: black;' +
-	' max-height: 90%;' +
-	' width: 20em;' +
+	' min-height: 65%; max-width: 100%; max-height: 65%;' +
 	' font-size: 2em;' +
 	' white-space: normal;' +
 	' text-align: justify;' +
-	' margin-top: 3em; margin-bottom: 3em;' +
+	' padding-top: 3em;' +
 	' margin-left: auto; margin-right: auto;' +
-	' overflow: scroll;' +
+	' padding-left: 5em; padding-right: 5em;' +
+	' overflow-y: scroll; overflow-x: hidden;' +
+	' word-wrap: break-word;' +
+	'}' +
+	'#lb-exit {' +
+	' position: fixed; top: 15; left: 15;' +
+	' color: #DDD; font-size: 2em;' +
+        '}' +
+	'#lb-exit:hover { color: #FFF; cursor: pointer;}' +
+	'#lb-pp {' +
+	' font-size: 3em; width: 6em;' +
+	' color: #DDD; letter-spacing: -0.15em;' +
+	'}' +
+	'#lb-pp:hover {' +
+	' color: #FFF; cursor: pointer;' +
+	'}' +
+	'#lb-controls {' +
+	' position: fixed; bottom: 0; left: 0; width: 50%; max-height: 15%;' +
+	' margin-left: auto; margin-right: auto;' +
 	'}';
     return css;
 }
@@ -125,14 +163,35 @@ function lightboxOverlay() {
     var content = document.createElement("div");
     content.setAttribute("id", "lb-content");
     lbdiv.appendChild(content);
+    var controls = document.createElement("div");
+    controls.setAttribute("id", "lb-controls");
+    var ppButton = document.createElement("span");
+    ppButton.innerHTML = '\u275A \u275A';
+    ppButton.setAttribute("id", "lb-pp");
+    controls.appendChild(ppButton);
+    lbdiv.appendChild(controls);
+    var exButton = document.createElement("span");
+    exButton.innerHTML = '\u00d7';
+    exButton.setAttribute("id", "lb-exit");
+    lbdiv.appendChild(exButton);
+
     return lbdiv;
 }
 
 function lightbox () {
     document.body.appendChild(lightboxStyle());
     document.body.appendChild(lightboxOverlay());
-    $('#lightbox').on("click", function() {
-	clearInterval(interval);
+    $('#lb-exit').on("click", function() {
+	pauseRead();
         $('#lightbox').hide();
+    });
+    $('#lb-pp').on("click", function() {
+        if(state.running) {
+	    pauseRead();
+	    $('#lb-pp').html('\u25B6');
+	} else {
+            goRead();
+	    $('#lb-pp').html('\u275A \u275A');
+	}
     });
 }
