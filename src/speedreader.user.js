@@ -25,6 +25,9 @@ function processSelection () {
 }
 
 function speedRead(s) {
+    $('#lb-content').html(s);
+    $('#lightbox').show();
+
   // $(s).css("background", "red");
   var wordArr = s.split(" ");
 
@@ -36,7 +39,7 @@ function speedRead(s) {
   function iterate(wordArr, pos) {
     var old= wordArr[pos];
     wordArr[pos] = "<span style='background:red'>"+old+"</span>";
-    $('html').html(wordArr.join(" "));
+    $('#lb-content').html(wordArr.join(" "));
     wordArr[pos]=old;
     if(curWord==null){
       clearInterval(myVar);
