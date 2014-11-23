@@ -9,8 +9,8 @@
 // ==/UserScript==
 
 var settings = {
-    wpm: 100,
-    chunkSize: 4,
+    wpm: 400,
+    chunkSize: 2,
     centred: false,
 };
 
@@ -257,14 +257,13 @@ function lightboxOverlay() {
     chunkSizeSlider.setAttribute("type","range");
     chunkSizeSlider.setAttribute("min",1);
     chunkSizeSlider.setAttribute("max",5);
-    $(chunkSizeSlider).val(settings.wpm);
+    $(chunkSizeSlider).val(settings.chunkSize);
     $(chunkSizeSlider).change(function(){
         var oldChunkSize = settings.chunkSize;
         settings.chunkSize= $(chunkSizeSlider).val();
         clearInterval(state.interval);
         var newStateIdx= Math.floor((state.idx*oldChunkSize)/settings.chunkSize);
         speedRead(state.rangeStr, newStateIdx);
-        // pauseRead();
     });
     controls.appendChild(chunkSizeSlider);
 
