@@ -66,10 +66,18 @@ function speedRead(s) {
 
 
         var top = $('#curword').position().top;
-        if (top > scrollPos) {
-            $('#lb-content').scrollTop( top );
-            scrollPos = top;
-        }
+	var scroll = $('#lb-content').scrollTop();
+
+	console.log(top.toString() + " <-> " + $('#lb-content').scrollTop().toString() + " <-> " + ($('#lb-content').scrollTop() - top).toString());
+	console.log($('#curword').scrollTop().toString());
+
+	if (top == 0) $('#lb-content').scrollTop(0);
+	if (top < 0) {
+            $('#lb-content').scrollTop(scroll + top); 
+	}
+	if (top >= 300) {
+            $('#lb-content').scrollTop(scroll + 230);
+	}
     }
 
     function getWordTime(wpm, numWords){
@@ -89,11 +97,10 @@ function lightboxStyle() {
 	'}' +
 	'#lb-content {' +
 	' color: black;' +
-	//' background-color: white;' +
 	' max-height: 90%;' +
 	' width: 20em;' +
 	' font-size: 2em;' +
-	' white-space: pre-wrap;' +
+	' white-space: normal;' +
 	' text-align: justify;' +
 	' margin-top: 3em; margin-bottom: 3em;' +
 	' margin-left: auto; margin-right: auto;' +
