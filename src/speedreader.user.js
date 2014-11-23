@@ -139,6 +139,24 @@ function pauseRead () {
     state.running = false;
 }
 
+document.onReady = setupHotkeys();
+
+function setupHotkeys(){
+    var isCtrl = false;
+    document.onkeyup=function(e) {
+        if(e.which == 17){
+            isCtrl=false;
+        }
+    };
+    document.onkeydown= function(e){
+        if(e.which == 17) {isCtrl=true; }
+        if(e.which == 81 && isCtrl == true) {
+            processSelection();
+            return false;
+        }
+    }
+};
+
 function lightboxStyle() {
     var css = document.createElement("style");
     css.type = "text/css";
@@ -189,14 +207,19 @@ function lightboxStyle() {
 
 function lightboxOverlay() {
     var lbdiv = document.createElement("div");
+
+    //content
     lbdiv.setAttribute("id", "lightbox");
     var content = document.createElement("div");
     content.setAttribute("id", "lb-content");
     lbdiv.appendChild(content);
+
+
     var centred = document.createElement("div");
     centred.setAttribute("id", "lb-centred");
     lbdiv.appendChild(centred);
 
+    //controls
     var controls = document.createElement("div");
     controls.setAttribute("id", "lb-controls");
     var ppButton = document.createElement("span");
@@ -211,6 +234,7 @@ function lightboxOverlay() {
 
     lbdiv.appendChild(controls);
 
+    //exitButton
     var exButton = document.createElement("span");
     exButton.innerHTML = '\u00d7';
     exButton.setAttribute("id", "lb-exit");
