@@ -7,6 +7,11 @@
 // @copyright  2014+, T. Humphries, S. Ruji
 // ==/UserScript==
 
+var settings = {
+    wpm: 400,
+    chunk: 1,
+};
+
 // Spawn floating button until we start to bundle
 var button = document.createElement("a");
 button.innerHTML = "Speed read selection";
@@ -16,6 +21,8 @@ button.setAttribute("style", "position: fixed; right: 0; left: auto;");
 document.body.insertBefore(button, document.body.firstChild);
 
 lightbox();
+
+var interval;
 
 function processSelection () {
     var selObj = window.getSelection();
@@ -28,39 +35,43 @@ function speedRead(s) {
     $('#lb-content').html(s);
     $('#lightbox').show();
 
-  // $(s).css("background", "red");
-  var wordArr = s.split(" ");
+    // Dreadful hacky munge
+    s = s.replace("\n\n", "<br/>");
+    s = s.replace("\n", " ");
 
-  var i=0;
-  var curWord= wordArr[i];
-  var wpm = 400;
-  var myVar = setInterval(function(){iterate(wordArr, i); i++;}, getWordTime(wpm, wordArr.length));
+    var wordArr = s.split(" ");
 
-  function iterate(wordArr, pos) {
-    var old= wordArr[pos];
-    wordArr[pos] = "<span style='background:red'>"+old+"</span>";
-    $('#lb-content').html(wordArr.join(" "));
-    wordArr[pos]=old;
-    if(curWord==null){
-      clearInterval(myVar);
+    var i=0;
+    var curWord= wordArr[i];
+
+    var scrollPos = 0;
+    interval = setInterval(function(){iterate(wordArr, i); i++;}, getWordTime(settings.wpm, wordArr.length));
+
+    function iterate(wordArr, pos) {
+        var old= wordArr[pos];
+
+	if (old==null){
+            clearInterval(myVar);
+	    return;
+        }
+
+	wordArr[pos] = "<span id=\"curword\" style='color:white;'>"+old+"</span>";
+        $('#lb-content').html(wordArr.join(" "));
+        wordArr[pos]=old;
+
+
+
+        var top = $('#curword').position().top;
+        if (top > scrollPos) {
+            $('#lb-content').scrollTop( top );
+            scrollPos = top;
+        }
     }
 
-    // var wordArr= ssplit(" ");
-    // if(wordArr.length !=0){
-    //   var i=0;
-    //   var curWord= wordArr[i];
-    //
-    //   while(curWord!=null){
-    //     alert(curWord);
-    //     curWord= wordArr[i++];
-    //   }
-    //   clearInterval(myVar);
-    // }
-  }
-  function getWordTime(wpm, numWords){
-    // alert(60000/numWords);
-    return 60000/numWords;
-  }
+    function getWordTime(wpm, numWords){
+        return 60000/wpm;
+    }
+
 }
 
 function lightboxStyle() {
@@ -74,11 +85,14 @@ function lightboxStyle() {
 	' overflow: scroll;' +
 	'}' +
 	'#lb-content {' +
-	' color: white;' +
+	' color: black;' +
+	//' background-color: white;' +
 	' max-height: 90%;' +
-	' width: 90%;' +
+	' width: 20em;' +
+	' font-size: 2em;' +
 	' white-space: pre-wrap;' +
 	' text-align: justify;' +
+	' margin-top: 3em; margin-bottom: 3em;' +
 	' margin-left: auto; margin-right: auto;' +
 	' overflow: scroll;' +
 	'}';
@@ -98,6 +112,7 @@ function lightbox () {
     document.body.appendChild(lightboxStyle());
     document.body.appendChild(lightboxOverlay());
     $('#lightbox').on("click", function() {
+	clearInterval(interval);
         $('#lightbox').hide();
     });
 }
