@@ -20,12 +20,44 @@ lightbox();
 function processSelection () {
     var selObj = window.getSelection();
     var range = selObj.getRangeAt(0);
+
     speedRead(range.toString());
 }
 
 function speedRead(s) {
-    $('#lb-content').html(s);
-    $('#lightbox').show();
+  // $(s).css("background", "red");
+  var wordArr = s.split(" ");
+
+  var i=0;
+  var curWord= wordArr[i];
+  var wpm = 400;
+  var myVar = setInterval(function(){iterate(wordArr, i); i++;}, getWordTime(wpm, wordArr.length));
+
+  function iterate(wordArr, pos) {
+    var old= wordArr[pos];
+    wordArr[pos] = "<span style='background:red'>"+old+"</span>";
+    $('html').html(wordArr.join(" "));
+    wordArr[pos]=old;
+    if(curWord==null){
+      clearInterval(myVar);
+    }
+
+    // var wordArr= ssplit(" ");
+    // if(wordArr.length !=0){
+    //   var i=0;
+    //   var curWord= wordArr[i];
+    //
+    //   while(curWord!=null){
+    //     alert(curWord);
+    //     curWord= wordArr[i++];
+    //   }
+    //   clearInterval(myVar);
+    // }
+  }
+  function getWordTime(wpm, numWords){
+    // alert(60000/numWords);
+    return 60000/numWords;
+  }
 }
 
 function lightboxStyle() {
