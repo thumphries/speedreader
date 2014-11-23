@@ -47,15 +47,19 @@ function speedRead(s) {
     var scrollPos = 0;
     interval = setInterval(function(){iterate(wordArr, i); i++;}, getWordTime(settings.wpm, wordArr.length));
 
+    var whitespan = "<span id=\"curword\" style='color:white;'>";
+    var endspan = "</span>";
+
     function iterate(wordArr, pos) {
         var old= wordArr[pos];
 
 	if (old==null){
-            clearInterval(myVar);
+            clearInterval(interval);
+	    $('#lb-content').html(whitespan + wordArr.join(" ") + endspan);
 	    return;
         }
 
-	wordArr[pos] = "<span id=\"curword\" style='color:white;'>"+old+"</span>";
+	wordArr[pos] = whitespan+old+endspan;
         $('#lb-content').html(wordArr.join(" "));
         wordArr[pos]=old;
 
