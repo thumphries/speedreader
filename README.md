@@ -10,7 +10,7 @@ Feature Priority List
 3. word rate based on length
 4. ~~chunk size~~
 5. ~~read whole article if nothing highlighted~~
-6. settings - i.e. slider in lightbox
+6. ~~settings - i.e. slider in lightbox~~
 7. images
 8. browser support
 9. browser setting storage
