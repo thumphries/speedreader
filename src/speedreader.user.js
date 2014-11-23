@@ -13,6 +13,11 @@ var settings = {
     centred: false,
 };
 
+var constants= {
+    msInSec: 60000,
+    engAvgWordLen: 5.1
+};
+
 var state = {
     running: false,
     interval: {},
@@ -44,8 +49,6 @@ function speedRead(s) {
     // Dreadful hacky munge
     s = s.replace("\n\n", "<br/>");
     s = s.replace("\n", " ");
-
-    state.wordArr = s.split(" ");
 
     //create regex for chunking
     var pattern = /[^ ]+/g;
@@ -106,18 +109,20 @@ function goRead () {
 
 
         var top = $('#curword').position().top;
-	var scroll = $('#lb-content').scrollTop();
+    	var scroll = $('#lb-content').scrollTop();
 
-	if (top == 0) $('#lb-content').scrollTop(0);
-	else if (top < 0) {
-            $('#lb-content').scrollTop(scroll + top);
-	} else if (top >= 300) {
-            $('#lb-content').scrollTop(scroll + 230);
-	}
+    	if (top == 0) $('#lb-content').scrollTop(0);
+
+    	if (top < 0) {
+                $('#lb-content').scrollTop(scroll + top);
+    	}
+    	if (top >= 300) {
+                $('#lb-content').scrollTop(scroll + 230);
+    	}
     }
 
     function getWordTime(wpm, numWords){
-        return 60000/wpm;
+      return constants.msInSec/wpm;
     }
 }
 
