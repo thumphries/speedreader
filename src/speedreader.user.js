@@ -190,7 +190,7 @@ function lightboxStyle() {
     "font: 12px arial, sans-serif;"+
 	' display: none;' +
 	' overflow: hidden;' +
-	//' z-index: 9999999;' +
+	' z-index: 9999999;' +
 	'}' +
 	'#lb-content, #lb-centred {' +
 	' color: #333;' +
@@ -203,7 +203,6 @@ function lightboxStyle() {
 	' padding-left: 5em; padding-right: 5em;' +
 	' overflow-y: scroll; overflow-x: hidden;' +
 	' word-wrap: break-word;' +
-	//' z-index: 99999999;'
 	'}' +
 	'#lb-centred {' +
 	' display: none; text-align: center;' +
@@ -212,13 +211,11 @@ function lightboxStyle() {
 	'#lb-exit {' +
 	' position: fixed; top: 15; left: 15;' +
 	' color: #DDD; font-size: 2em;' +
-	//' z-index: 999999999;' +
         '}' +
 	'#lb-exit:hover { color: #FFF; cursor: pointer;}' +
 	'#lb-pp {' +
 	' font-size: 3em; width: 6em;' +
 	' color: #DDD; letter-spacing: -0.15em;' +
-	//' z-index: inherit;' +
 	'}' +
 	'#lb-pp:hover {' +
 	' color: #FFF; cursor: pointer;' +
@@ -229,10 +226,8 @@ function lightboxStyle() {
 	'#lb-controls {' +
 	' position: fixed; bottom: 0; left: 0; width: 50%; max-height: 15%;' +
 	' margin-left: auto; margin-right: auto;' +
-	//' z-index: 9999999; ' +
 	'}' +
 	'#sp-read {' +
-	//' z-index: 999999;' +
 	'}'+
         "#lb-timeRem{"+
         " color: white;"+
