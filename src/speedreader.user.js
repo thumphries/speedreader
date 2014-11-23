@@ -69,6 +69,7 @@ function speedRead(s, startIdx) {
 }
 
 function goRead () {
+    updateWpm();
     if (settings.centred) {
 	$("#lb-content").hide();
         $("#lb-centred").show();
@@ -228,9 +229,13 @@ function lightboxStyle() {
 	'#sp-read {' +
 	'}'+
         "#lb-timeRem{"+
-        " color: white; font-size: 3em;"+
+        " color: white; font-size: 2em;"+
         " font-style: bold;"+
-	' position: fixed; right: 1em; bottom: 1em;' +
+	' position: fixed; right: 1.5em; top: 1.5em;' +
+	'}' +
+	'#lb-wpmdisp {' +
+	' position: fixed; right: 1.5em; bottom: 1.5em;' +
+	' color: #DDD; font-size: 2em;' +
 	'}' +
 	'#wmpSpan, #chunkSpan {' +
 	' width: 40%; height: 100%;' +
@@ -253,6 +258,9 @@ function updateRemTime(){
     //sec = Math.floor((remTime/1000) % 60);
     var remTimeStr= min + "m";
     $('#lb-timeRem').html(remTimeStr);
+}
+function updateWpm() {
+    $('#lb-wpmdisp').html(settings.wpm + "WPM/" + settings.chunkSize);
 }
 function lightboxOverlay() {
     var lbdiv = document.createElement("div");
@@ -294,6 +302,7 @@ function lightboxOverlay() {
     $(wpmVal).change(function(){
         settings.wpm= $(wpmVal).val();
         clearInterval(state.interval);
+	updateWpm();
         goRead();
     });
     // Good lord this is spaghetti - take care when reordering
@@ -337,6 +346,12 @@ function lightboxOverlay() {
     timeRem.setAttribute("id","lb-timeRem");
     updateRemTime();
     lbdiv.appendChild(timeRem);
+
+    // WPM display
+    var wpmDisp = document.createElement("span");
+    wpmDisp.setAttribute("id", "lb-wpmdisp");
+    updateWpm();
+    lbdiv.appendChild(wpmDisp);
 
     // exitButton
     var exButton = document.createElement("span");
