@@ -2,9 +2,9 @@
 // @name       Speed Reader
 // @namespace  http://github.com/shelf/speedreader
 // @version    0.1
-// @require       http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
+// @require    http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @description  Fascinating speed reading tool
-// @match      http://*/*
+// @match      *
 // @copyright  2014+, T. Humphries, S. Ruji
 // ==/UserScript==
 
@@ -29,13 +29,19 @@ var state = {
 // Spawn floating button until we start to bundle
 var button = document.createElement("a");
 button.innerHTML = "Speed read selection";
-button.setAttribute("href", "#");
-//button.setAttribute("onclick", "processSelection(); return false;")
-button.onclick = processSelection;
+button.setAttribute("id", "sp-read");
+button.onclick = aaaaaa;
 button.setAttribute("style", "position: fixed; right: 0; left: auto;");
 document.body.insertBefore(button, document.body.firstChild);
 
 lightbox();
+
+function aaaaaa () {
+    alert("what the shit");
+    var fun = processSelection;
+    processSelection();
+    return false;
+}
 
 function processSelection () {
     var selObj = window.getSelection();
@@ -118,18 +124,21 @@ function goRead () {
         wordArr[pos]=old;
 
 
-
-        var top = $('#curword').position().top;
-    	var scroll = $('#lb-content').scrollTop();
-
-    	if (top == 0) $('#lb-content').scrollTop(0);
-
-    	if (top < 0) {
+	var cw = $('#curword');
+	var pos = cw.position();
+        if (!cw || pos === undefined ||
+	    (cw && pos !== undefined && pos.top == 0)) {
+             $('#lb-content').scrollTop(0);
+	} else {
+            var top = pos.top;
+       	    var scroll = $('#lb-content').scrollTop();
+      	    if (top < 0) {
                 $('#lb-content').scrollTop(scroll + top);
-    	}
-    	if (top >= 300) {
+      	    }
+      	    if (top >= 300) {
                 $('#lb-content').scrollTop(scroll + 230);
-    	}
+      	    }
+	}
     }
 
     function getWordTime(wpm, numWords){
@@ -205,6 +214,9 @@ function lightboxStyle() {
 	'#lb-controls {' +
 	' position: fixed; bottom: 0; left: 0; width: 50%; max-height: 15%;' +
 	' margin-left: auto; margin-right: auto;' +
+	'}' +
+	'#sp-read {' +
+	' z-index: 999999;' +
 	'}';
     return css;
 }
@@ -230,11 +242,6 @@ function lightboxOverlay() {
     ppButton.innerHTML = '\u275A \u275A';
     ppButton.setAttribute("id", "lb-pp");
     controls.appendChild(ppButton);
-    //slider
-    var slider = document.createElement("div");
-    $(slider).slider();
-    controls.appendChild(slider);
-
 
     var modeButton = document.createElement("span");
     modeButton.innerHTML = 'C';
