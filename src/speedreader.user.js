@@ -12,11 +12,18 @@ var settings = {
     wpm: 400,
     chunkSize: 2,
     centred: false,
+    highlight: "#FFF",
+    lowlight: "#151515",
 };
 
 var constants= {
     msInSec: 60000,
-    engAvgWordLen: 5.1
+    engAvgWordLen: 5.1,
+    pauseButton: '\u275A \u275A',
+    playButton: '\u25B6',
+    unCentered: '\u2261',
+    centered: '\u2012',
+    exitButton: '\u00d7',
 };
 
 var state = {
@@ -40,7 +47,7 @@ function processSelection () {
         range = selObj.getRangeAt(0);
     }
     state.rangeStr= range.toString();
-    $('#lb-pp').html('\u275A \u275A');
+    $('#lb-pp').html(constants.pauseButton);
     speedRead(range.toString(), 0);
 }
 
@@ -58,14 +65,28 @@ function initWordArr(s){
 }
 
 function speedRead(s, startIdx) {
-    $('#lb-content').html(s);
+    //$('#lb-content').html(s);
+
     $('#lightbox').show();
 
     state.wordArr = initWordArr(s);
-
+    var st = spanIt();
+    $('#lb-content').html(spanIt());
+    console.log(st);
     state.idx = startIdx;
 
     goRead ();
+}
+
+function spanIt () {
+    var i = 0;
+    var s = "";
+    while (state.wordArr[i] != null) {
+        s += "<span class='sprd-word' id='sprd-" + i + "'>" +
+	     state.wordArr[i] + "</span> ";
+	i++;
+    }
+    return s;
 }
 
 function goRead () {
@@ -78,6 +99,7 @@ function goRead () {
         $("#lb-content").show();
     }
 
+    $('.sprd-word').css("color", settings.lowlight);
     state.running = true;
     var curWord = state.wordArr[state.idx];
 
@@ -90,8 +112,7 @@ function goRead () {
 
     function iterate(wordArr, pos) {
         var old= wordArr[pos];
-        var whiteSpan= "<span id=\"curword\" style='color:white;'>";
-        var endSpan = "</span>";
+
         updateRemTime();
     	if (old==null){
             clearInterval(state.interval);
@@ -99,23 +120,25 @@ function goRead () {
     	    // We want justified style on halt
             $('#lb-centred').hide();
     	    $('#lb-content').show();
-     	    $('#lb-content').html(whiteSpan + wordArr.join(" ") + endSpan);
+     	    //$('#lb-content').html(whiteSpan + wordArr.join(" ") + endSpan);
+	    $('.sprd-word').css("color", settings.highlight);
     	    state.running = false;
 
     	    // Reset idx and scroll
-    	    $("#lb-pp").html('\u27f2');
+    	    $("#lb-pp").html(constants.playButton);
     	    state.idx = 0;
         } else {
-            wordArr[pos] = whiteSpan+old+endSpan;
             if (!settings.centred) {
-                $('#lb-content').html(wordArr.join(" "));
+                //$('#lb-content').html(wordArr.join(" "));
+		$('#sprd-' + pos).css("color", "#FFF");
+		$('#sprd-' + (pos - 1)).css("color", settings.lowlight);
             } else {
+		var whiteSpan= "<span id=\"curword\" style='color:white;'>";
+                var endSpan = "</span>";
                 $('#lb-centred').html(whiteSpan + wordArr[pos] + endSpan);
 	    }
 
-            wordArr[pos]=old;
-
-	    var cw = $('#curword');
+	    var cw = $('#sprd-' + pos);
 	    var pos = cw.position();
             if (!cw || pos === undefined ||
 	        (cw && pos !== undefined && pos.top == 0)) {
@@ -185,7 +208,7 @@ function lightboxStyle() {
 	' z-index: 9999999;' +
 	'}' +
 	'#lb-content, #lb-centred {' +
-	' color: #151515;' +
+	' color: ' + settings.lowlight + ';' +
 	' min-height: 65%; max-width: 100%; max-height: 65%;' +
 	' font-size: 2em;' +
 	' white-space: normal;' +
@@ -284,7 +307,7 @@ function lightboxOverlay() {
     var controls = document.createElement("div");
     controls.setAttribute("id", "lb-controls-inner");
     var ppButton = document.createElement("div");
-    ppButton.innerHTML = '\u275A \u275A';
+    ppButton.innerHTML = constants.pauseButton;
     ppButton.setAttribute("id", "lb-pp");
 
     var controlCnt = document.createElement("div");
@@ -340,6 +363,9 @@ function lightboxOverlay() {
         settings.chunkSize= $(chunkSizeSlider).val();
         clearInterval(state.interval);
         var newStateIdx= Math.floor((state.idx*oldChunkSize)/settings.chunkSize);
+	if (state.running == false) {
+	    $('#lb-pp').html(constants.pauseButton);
+	}
         speedRead(state.rangeStr, newStateIdx);
     });
     chunkSpan.appendChild(chunkSizeSlider);
@@ -349,7 +375,7 @@ function lightboxOverlay() {
 
     // mode
     var modeButton = document.createElement("span");
-    modeButton.innerHTML = '\u2261';
+    modeButton.innerHTML = constants.unCentered;
     modeButton.setAttribute("id", "lb-mode");
 
     modeButton.setAttribute("title", "View Mode");
@@ -371,7 +397,7 @@ function lightboxOverlay() {
 
     // exitButton
     var exButton = document.createElement("span");
-    exButton.innerHTML = '\u00d7';
+    exButton.innerHTML = constants.exitButton;
     exButton.setAttribute("title", "Close");
     exButton.setAttribute("id", "lb-exit");
     lbdiv.appendChild(exButton);
@@ -390,10 +416,10 @@ function lightbox () {
     var pp = function() {
         if(state.running) {
 	    pauseRead();
-	    $('#lb-pp').html('\u25B6');
+	    $('#lb-pp').html(constants.playButton);
 	} else {
             goRead();
-	    $('#lb-pp').html('\u275A \u275A');
+	    $('#lb-pp').html(constants.pauseButton);
 	}
     };
 
@@ -402,12 +428,12 @@ function lightbox () {
             $("#lb-centred").hide();
 	    $("#lb-content").show();
 	    settings.centred = false;
-	    $("#lb-mode").html('\u2261');
+	    $("#lb-mode").html(constants.unCentered);
 	} else {
 	    $("#lb-content").hide();
 	    $("#lb-centred").show();
 	    settings.centred = true;
-	    $("#lb-mode").html('\u2012');
+	    $("#lb-mode").html(constants.centered);
 	}
     }
 
