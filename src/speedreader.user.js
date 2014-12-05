@@ -11,9 +11,12 @@
 var settings = {
     wpm: 400,
     chunkSize: 2,
-    centred: false,
+    centred: true,
     highlight: "#FFF",
     lowlight: "#151515",
+    buttonColor: "#DDD",
+    buttonHover: "#FFF",
+    panelColor: "#333",
 };
 
 var constants= {
@@ -36,12 +39,14 @@ var state = {
 
 var elts = {
     lightbox: null,
+    content: null,
     centred: null,
     controls: null,
     ppButton: null,
     controlCnt: null,
     wmpSpan: null,
     wmpLabel: null,
+    wpmDisp: null,
     wpmVal: null,
     chunkSpan: null,
     chunkLabel: null,
@@ -210,87 +215,142 @@ function setupHotkeys(){
 };
 
 function lightboxStyle() {
-    var css = document.createElement("style");
-    css.type = "text/css";
-    css.innerHTML =
-    '#lightbox {' +
-	' position: fixed; top:0; left:0; width: 100%; height: 100%;' +
-	' background-color: black;' +
-    "font: 12px arial, sans-serif;"+
-	' display: none;' +
-	' overflow: hidden;' +
-	' z-index: 9999999;' +
-	'}' +
-	'#lb-content, #lb-centred {' +
-	' color: ' + settings.lowlight + ';' +
-	' min-height: 65%; max-width: 100%; max-height: 65%;' +
-	' font-size: 2em;' +
-	' white-space: normal;' +
-	' text-align: justify;' +
-	' padding-top: 3em;' +
-	' margin-left: auto; margin-right: auto;' +
-	' padding-left: 5em; padding-right: 5em;' +
-	' overflow-y: scroll; overflow-x: hidden;' +
-	' word-wrap: break-word;' +
-	'}' +
-	'#lb-centred {' +
-	' display: none; text-align: center;' +
-	' padding-top: 8em; padding-bottom: auto;' +
-	'}' +
-	'#lb-exit {' +
-	' position: fixed; top: 1em; left: 1em;' +
-	' color: #DDD; font-size: 3em;' +
-        '}' +
-	'#lb-exit:hover { color: #FFF; cursor: pointer;}' +
-	'#lb-pp {' +
-	' font-size: 3em; width: 15%; margin-left: auto; margin-right: auto;' +
-	' clear: none;' +
-	' color: #DDD; letter-spacing: -0.15;' +
-	'}' +
-	'#lb-pp:hover {' +
-	' color: #FFF; cursor: pointer;' +
-	'}' +
-	'#lb-mode {' +
-	' color: #DDD; font-size: 3em;' +
-	' position: fixed; left: 1em; bottom: 1em;' +
-	'}' +
-	'#lb-mode:hover {' +
-	' color: #FFF; cursor: pointer;' +
-        '}' +
-	'#lb-controls {' +
-	' position: fixed; bottom: 3em; width: 50%; max-height: 15%;' +
-	' margin-left: 25%; margin-right: 25%;' +
-	'}' +
-	'#lb-controls-inner {' +
-	' width: 100%; margin-left: auto; margin-right: auto;' +
-	' background-color: #333;' +
-	' border-radius: 0.5em;' +
-	' column-count: 3;' +
-	'}' +
-	'#sp-read {' +
-	'}'+
-        "#lb-timeRem{"+
-        " color: white; font-size: 2em;"+
-        " font-style: bold;"+
-	' position: fixed; right: 1.5em; top: 1.5em;' +
-	'}' +
-	'#lb-wpmdisp {' +
-	' position: fixed; right: 1.5em; bottom: 1.5em;' +
-	' color: #DDD; font-size: 2em;' +
-	'}' +
-	'#wmpSpan, #chunkSpan {' +
-	' width: 40%; height: 100%;' +
-	' color: #DDD; font-size: 1.2em;' +
-	' padding-top: 0.5em;' +
-	'}' +
-	'#wmpSpan { float: left; }' +
-	'#chunkSpan { float: right; }' +
-	'#wmpSpan span, #chunkSpan label {' +
-	' padding-top: auto; padding-bottom: 1em;' +
-        //' width: 5em; padding-left: auto; margin-right: 2em;' +
-	'}';
-    return css;
+    //var css = document.createElement("style");
+    //css.type = "text/css";
+    $(elts.lightbox).css({
+        "position"        : "fixed",
+	"top"             : "0",
+	"left"            : "0",
+	"width"           : "100%",
+	"height"          : "100%",
+	"background-color": "black",
+	"font"            : "12px arial, sans-serif",
+	"overflow"        : "hidden",
+	"z-index"         : "9999999",
+	"display"         : "none",
+    });
+    var contentStyle = {
+        "color"        : settings.lowlight,
+	"min-height"   : "65%",
+	"max-width"    : "100%",
+	"max-height"   : "65%",
+	"font-size"    : "2em",
+	"white-space"  : "normal",
+	"text-align"   : "justify",
+	"padding-top"  : "3em",
+	"margin-left"  : "auto",
+	"margin-right" : "auto",
+	"padding-left" : "5em",
+	"padding-right": "5em",
+	"overflow-y"   : "scroll",
+	"overflow-x"   : "hidden",
+	"word-wrap"    : "break-word",
+    };
+    $(elts.content).css(contentStyle);
+    $(elts.centred).css(contentStyle);
+    // centred has a few minor differences...
+    $(elts.centred).css("display", "none");
+    $(elts.centred).css("text-align", "center");
+    $(elts.centred).css("padding-top", "8em");
+    $(elts.centred).css("padding-bottom", "auto");
+
+    $(elts.exButton).css({
+        "position"  : "fixed",
+	"top"       : "1em",
+	"left"      : "1em",
+	"color"     : settings.buttonColor,
+	"font-size" : "3em",
+	"cursor"    : "pointer",
+    });
+    $(elts.exButton).hover(
+	function () { $(elts.exButton).css("color", settings.buttonHover); },
+        function () { $(elts.exButton).css("color", settings.buttonColor); }
+    );
+
+    $(elts.ppButton).css({
+        "font-size"      : "3em",
+	"width"          : "15%",
+	"margin-left"    : "auto",
+	"margin-right"   : "auto",
+	"clear"          : "none",
+	"color"          : settings.buttonColor,
+	"letter-spacing" : "-0.15",
+	"cursor"         : "pointer",
+    });
+    $(elts.ppButton).hover(
+        function () { $(elts.ppButton).css("color", settings.buttonHover); },
+	function () { $(elts.ppButton).css("color", settings.buttonColor); }
+    );
+
+    $(elts.modeButton).css({
+        "color"     : "#DDD",
+	"font-size" : "3em",
+	"position"  : "fixed",
+	"left"      : "1em",
+	"bottom"    : "1em",
+	"cursor"    : "pointer",
+    });
+    $(elts.modeButton).hover(
+        function () { $(elts.modeButton).css("color", settings.buttonHover);} ,
+	function () { $(elts.modeButton).css("color", settings.buttonColor);}
+    );
+
+    $(elts.controlCnt).css({
+        "position"     : "fixed",
+	"botton"       : "3em",
+	"width"        : "50%",
+	"max-height"   : "15%",
+	"margin-left"  : "25%",
+	"margin-right" : "25%",
+    });
+
+    $(elts.controls).css({
+        "width"        : "100%",
+	"margin-left"  : "auto",
+	"margin-right" : "auto",
+	"background-color" : settings.panelColor,
+	"border-radius": "0.5em",
+	"column-count" : "3",
+    });
+
+    $(elts.timeRem).css({
+        "color"      : settings.buttonColor,
+	"font-size"  : "2em",
+	"font-style" : "bold",
+	"position"   : "fixed",
+	"right"      : "1.5em",
+	"top"        : "1.5em",
+    });
+
+    $(elts.wpmDisp).css({
+        "position"  : "fixed",
+	"right"     : "1.5em",
+	"bottom"    : "1.5em",
+	"color"     : settings.buttonColor,
+	"font-size" : "2em",
+    });
+
+    var sliders = {
+        "width"       : "40%",
+	"height"      : "100%",
+	"color"       : settings.buttonColor,
+	"font-size"   : "1.2em",
+	"padding-top" : "0.5em",
+    };
+    $(elts.wmpSpan).css(sliders);
+    $(elts.wmpSpan).css("float", "left");
+    $(elts.chunkSpan).css(sliders);
+    $(elts.chunkSpan).css("float", "right");
+    $(elts.wmpSpan).find("label").css({
+	"padding-top" : "auto",
+	"padding-bottom" : "1em",
+    });
+    $(elts.chunkSpan).find("label").css({
+	"padding-top" : "auto",
+	"padding-bottom" : "1em",
+    });
 }
+
 function updateRemTime(){
     var remIndexes= (state.wordArr.length-(state.idx));
     // alert(remIndexes);
@@ -412,8 +472,10 @@ function lightboxOverlay() {
 
 function lightbox () {
     lightboxOverlay();
-    document.body.appendChild(lightboxStyle());
+
+    lightboxStyle();
     document.body.appendChild(elts.lightbox);
+
     $('#lb-exit').on("click", function() {
 	pauseRead();
 	document.body.removeChild(elts.lightbox);
