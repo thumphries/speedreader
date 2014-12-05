@@ -34,6 +34,24 @@ var state = {
     remTime:0,
 };
 
+var elts = {
+    lightbox: null,
+    centred: null,
+    controls: null,
+    ppButton: null,
+    controlCnt: null,
+    wmpSpan: null,
+    wmpLabel: null,
+    wpmVal: null,
+    chunkSpan: null,
+    chunkLabel: null,
+    chunkSizeSlider: null,
+    modeButton: null,
+    timeRem: null,
+    wpmDisp: null,
+    exButton: null,
+}
+
 lightbox();
 
 function processSelection () {
@@ -65,16 +83,12 @@ function initWordArr(s){
 }
 
 function speedRead(s, startIdx) {
-    //$('#lb-content').html(s);
-
     $('#lightbox').show();
 
     state.wordArr = initWordArr(s);
     var st = spanIt();
     $('#lb-content').html(spanIt());
-    console.log(st);
     state.idx = startIdx;
-
     goRead ();
 }
 
@@ -290,77 +304,70 @@ function updateWpm() {
     $('#lb-wpmdisp').html(settings.wpm + "WPM/" + settings.chunkSize);
 }
 function lightboxOverlay() {
-    var lbdiv = document.createElement("div");
+    elts.lightbox = document.createElement("div");
 
     //content
-    lbdiv.setAttribute("id", "lightbox");
-    var content = document.createElement("div");
-    content.setAttribute("id", "lb-content");
-    lbdiv.appendChild(content);
+    elts.lightbox.setAttribute("id", "lightbox");
+    elts.content = document.createElement("div");
+    elts.content.setAttribute("id", "lb-content");
+    elts.lightbox.appendChild(elts.content);
 
 
-    var centred = document.createElement("div");
-    centred.setAttribute("id", "lb-centred");
-    lbdiv.appendChild(centred);
+    elts.centred = document.createElement("div");
+    elts.centred.setAttribute("id", "lb-centred");
+    elts.lightbox.appendChild(elts.centred);
 
     //controls
-    var controls = document.createElement("div");
-    controls.setAttribute("id", "lb-controls-inner");
-    var ppButton = document.createElement("div");
-    ppButton.innerHTML = constants.pauseButton;
-    ppButton.setAttribute("id", "lb-pp");
+    elts.controls = document.createElement("div");
+    elts.controls.setAttribute("id", "lb-controls-inner");
+    elts.ppButton = document.createElement("div");
+    elts.ppButton.innerHTML = constants.pauseButton;
+    elts.ppButton.setAttribute("id", "lb-pp");
 
-    var controlCnt = document.createElement("div");
-    controlCnt.setAttribute("id", "lb-controls");
+    elts.controlCnt = document.createElement("div");
+    elts.controlCnt.setAttribute("id", "lb-controls");
 
     //wpm slider
-    var wmpSpan= document.createElement("div");
-    wmpSpan.setAttribute("id","wmpSpan");
-    var wmpLabel = document.createElement("label");
-    $(wmpLabel).text("WPM");
-    wmpSpan.appendChild(wmpLabel);
+    elts.wmpSpan= document.createElement("div");
+    elts.wmpSpan.setAttribute("id","wmpSpan");
+    elts.wmpLabel = document.createElement("label");
+    $(elts.wmpLabel).text("WPM");
+    elts.wmpSpan.appendChild(elts.wmpLabel);
 
-    var wpmVal = document.createElement("input");
-    wpmVal.setAttribute("id","lb-wpm");
-    wpmVal.setAttribute("type","range");
-    wpmVal.setAttribute("min",100);
-    wpmVal.setAttribute("max",2000);
-    wpmVal.setAttribute("title", "Words Per Minute");
-    // var wpmDL= document.createElement("datalist");
-    // wmpSpan.appendChild(wpmDL);
-    // wpmDL.setAttribute("id","wpmDl");
-    // for(var i=0; i<4;i++){
-    //     $(wpmDL).append("<option value='"+ i*500+"'>");
-    // }
-    // $(wpmVal).attr("list", "wpmDl");
+    elts.wpmVal = document.createElement("input");
+    elts.wpmVal.setAttribute("id","lb-wpm");
+    elts.wpmVal.setAttribute("type","range");
+    elts.wpmVal.setAttribute("min",100);
+    elts.wpmVal.setAttribute("max",2000);
+    elts.wpmVal.setAttribute("title", "Words Per Minute");
 
-    $(wpmVal).val(settings.wpm);
-    $(wpmVal).change(function(){
-        settings.wpm= $(wpmVal).val();
+    $(elts.wpmVal).val(settings.wpm);
+    $(elts.wpmVal).change(function(){
+        settings.wpm= $(elts.wpmVal).val();
         clearInterval(state.interval);
 	updateWpm();
         goRead();
     });
     // Good lord this is spaghetti - take care when reordering
-    wmpSpan.appendChild(wpmVal);
-    controls.appendChild(wmpSpan);
+    elts.wmpSpan.appendChild(elts.wpmVal);
+    elts.controls.appendChild(elts.wmpSpan);
 
     //chunk size
-    var chunkSpan= document.createElement("div");
-    chunkSpan.setAttribute("id","chunkSpan");
-    var chunkLabel = document.createElement("label");
-    $(chunkLabel).text("Chunk");
+    elts.chunkSpan= document.createElement("div");
+    elts.chunkSpan.setAttribute("id","chunkSpan");
+    elts.chunkLabel = document.createElement("label");
+    $(elts.chunkLabel).text("Chunk");
 
-    var chunkSizeSlider = document.createElement("input");
-    chunkSizeSlider.setAttribute("id","lb-chunks");
-    chunkSizeSlider.setAttribute("type","range");
-    chunkSizeSlider.setAttribute("min",1);
-    chunkSizeSlider.setAttribute("max",5);
-    chunkSizeSlider.setAttribute("title", "Chunk Size");
-    $(chunkSizeSlider).val(settings.chunkSize);
-    $(chunkSizeSlider).change(function(){
+    elts.chunkSizeSlider = document.createElement("input");
+    elts.chunkSizeSlider.setAttribute("id","lb-chunks");
+    elts.chunkSizeSlider.setAttribute("type","range");
+    elts.chunkSizeSlider.setAttribute("min",1);
+    elts.chunkSizeSlider.setAttribute("max",5);
+    elts.chunkSizeSlider.setAttribute("title", "Chunk Size");
+    $(elts.chunkSizeSlider).val(settings.chunkSize);
+    $(elts.chunkSizeSlider).change(function(){
         var oldChunkSize = settings.chunkSize;
-        settings.chunkSize= $(chunkSizeSlider).val();
+        settings.chunkSize= $(elts.chunkSizeSlider).val();
         clearInterval(state.interval);
         var newStateIdx= Math.floor((state.idx*oldChunkSize)/settings.chunkSize);
 	if (state.running == false) {
@@ -368,49 +375,48 @@ function lightboxOverlay() {
 	}
         speedRead(state.rangeStr, newStateIdx);
     });
-    chunkSpan.appendChild(chunkSizeSlider);
-    chunkSpan.appendChild(chunkLabel);
-    controls.appendChild(chunkSpan);
-    controls.appendChild(ppButton);
+    elts.chunkSpan.appendChild(elts.chunkSizeSlider);
+    elts.chunkSpan.appendChild(elts.chunkLabel);
+    elts.controls.appendChild(elts.chunkSpan);
+    elts.controls.appendChild(elts.ppButton);
 
     // mode
-    var modeButton = document.createElement("span");
-    modeButton.innerHTML = constants.unCentered;
-    modeButton.setAttribute("id", "lb-mode");
+    elts.modeButton = document.createElement("span");
+    elts.modeButton.innerHTML = constants.unCentered;
+    elts.modeButton.setAttribute("id", "lb-mode");
 
-    modeButton.setAttribute("title", "View Mode");
-    lbdiv.appendChild(modeButton);
-    controlCnt.appendChild(controls);
-    lbdiv.appendChild(controlCnt);
+    elts.modeButton.setAttribute("title", "View Mode");
+    elts.lightbox.appendChild(elts.modeButton);
+    elts.controlCnt.appendChild(elts.controls);
+    elts.lightbox.appendChild(elts.controlCnt);
 
     // time remaining
-    var timeRem = document.createElement("span");
-    timeRem.setAttribute("id","lb-timeRem");
+    elts.timeRem = document.createElement("span");
+    elts.timeRem.setAttribute("id","lb-timeRem");
     updateRemTime();
-    lbdiv.appendChild(timeRem);
+    elts.lightbox.appendChild(elts.timeRem);
 
     // WPM display
-    var wpmDisp = document.createElement("span");
-    wpmDisp.setAttribute("id", "lb-wpmdisp");
+    elts.wpmDisp = document.createElement("span");
+    elts.wpmDisp.setAttribute("id", "lb-wpmdisp");
     updateWpm();
-    lbdiv.appendChild(wpmDisp);
+    elts.lightbox.appendChild(elts.wpmDisp);
 
     // exitButton
-    var exButton = document.createElement("span");
-    exButton.innerHTML = constants.exitButton;
-    exButton.setAttribute("title", "Close");
-    exButton.setAttribute("id", "lb-exit");
-    lbdiv.appendChild(exButton);
-
-    return lbdiv;
+    elts.exButton = document.createElement("span");
+    elts.exButton.innerHTML = constants.exitButton;
+    elts.exButton.setAttribute("title", "Close");
+    elts.exButton.setAttribute("id", "lb-exit");
+    elts.lightbox.appendChild(elts.exButton);
 }
 
 function lightbox () {
+    lightboxOverlay();
     document.body.appendChild(lightboxStyle());
-    document.body.appendChild(lightboxOverlay());
+    document.body.appendChild(elts.lightbox);
     $('#lb-exit').on("click", function() {
 	pauseRead();
-        $('#lightbox').hide();
+	document.body.removeChild(elts.lightbox);
     });
 
     var pp = function() {
