@@ -1,1 +1,0 @@
-../src/speedreader.user.js

@@ -206,11 +206,7 @@ function setupHotkeys(){
         if(e.which == 81 && isCtrl == true) {
             processSelection();
             return false;
-        } else if (e.which == 27) {
-            // esc
-	    pauseRead();
-            $('#lightbox').hide();
-	}
+        }
     }
 };
 
