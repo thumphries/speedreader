@@ -124,7 +124,11 @@ function goRead () {
         $("#lb-content").show();
     }
 
-    $('.sprd-word').css("color", settings.lowlight);
+    var nodes = elts.content.childNodes;
+    var i = 0;
+    for (i = 0; i < nodes.length; i++) {
+        $(nodes[i]).css("color", settings.lowlight);
+    }
     state.running = true;
     var curWord = state.wordArr[state.idx];
 
@@ -146,7 +150,12 @@ function goRead () {
             $('#lb-centred').hide();
     	    $('#lb-content').show();
      	    //$('#lb-content').html(whiteSpan + wordArr.join(" ") + endSpan);
-	    $('.sprd-word').css("color", settings.highlight);
+	    var nodes = elts.content.childNodes;
+	    var i = 0;
+            for (i = 0; i < nodes.length; i++) {
+                $(nodes[i]).css("color", settings.highlight);
+	    }
+	    //$('.sprd-word').css("color", settings.highlight);
     	    state.running = false;
 
     	    // Reset idx and scroll
@@ -163,19 +172,19 @@ function goRead () {
                 $('#lb-centred').html(whiteSpan + wordArr[pos] + endSpan);
 	    }
 
-	    var cw = $('#sprd-' + pos);
+	    var cw = $(state.spans[pos]);
 	    var pos = cw.position();
             if (!cw || pos === undefined ||
 	        (cw && pos !== undefined && pos.top == 0)) {
-                 $('#lb-content').scrollTop(0);
+                $(elts.content).scrollTop(0);
 	    } else {
                 var top = pos.top;
-       	        var scroll = $('#lb-content').scrollTop();
+       	        var scroll = $(elts.content).scrollTop();
       	        if (top < 0) {
-                    $('#lb-content').scrollTop(scroll + top);
+                    $(elts.content).scrollTop(scroll + top);
       	        }
       	        if (top >= 300) {
-                    $('#lb-content').scrollTop(scroll + 230);
+                    $(elts.content).scrollTop(scroll + 230);
       	        }
             }
 	}
