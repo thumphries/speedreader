@@ -33,6 +33,7 @@ var state = {
     running: false,
     interval: {},
     wordArr: [],
+    spans: [],
     idx: 0,
     remTime:0,
 };
@@ -91,21 +92,26 @@ function speedRead(s, startIdx) {
     $('#lightbox').show();
 
     state.wordArr = initWordArr(s);
-    var st = spanIt();
-    $('#lb-content').html(spanIt());
+
+    spanIt(elts.content);
     state.idx = startIdx;
     goRead ();
 }
 
-function spanIt () {
+function spanIt (div) {
+    // Delete all existing spans first
+    while (div.firstChild) {
+        div.removeChild(div.firstChild);
+    }
+
     var i = 0;
-    var s = "";
     while (state.wordArr[i] != null) {
-        s += "<span class='sprd-word' id='sprd-" + i + "'>" +
-	     state.wordArr[i] + "</span> ";
+	var span = document.createElement("span");
+	span.innerHTML = state.wordArr[i];
+	state.spans[i] = span;
+	div.appendChild(span);
 	i++;
     }
-    return s;
 }
 
 function goRead () {
@@ -149,8 +155,8 @@ function goRead () {
         } else {
             if (!settings.centred) {
                 //$('#lb-content').html(wordArr.join(" "));
-		$('#sprd-' + pos).css("color", "#FFF");
-		$('#sprd-' + (pos - 1)).css("color", settings.lowlight);
+		$(state.spans[pos]).css("color", settings.highlight);
+		$(state.spans[pos-1]).css("color", settings.lowlight);
             } else {
 		var whiteSpan= "<span id=\"curword\" style='color:white;'>";
                 var endSpan = "</span>";
@@ -215,8 +221,6 @@ function setupHotkeys(){
 };
 
 function lightboxStyle() {
-    //var css = document.createElement("style");
-    //css.type = "text/css";
     $(elts.lightbox).css({
         "position"        : "fixed",
 	"top"             : "0",
@@ -283,7 +287,7 @@ function lightboxStyle() {
     );
 
     $(elts.modeButton).css({
-        "color"     : "#DDD",
+        "color"     : settings.buttonColor,
 	"font-size" : "3em",
 	"position"  : "fixed",
 	"left"      : "1em",
@@ -427,8 +431,8 @@ function lightboxOverlay() {
     $(elts.chunkSizeSlider).val(settings.chunkSize);
     $(elts.chunkSizeSlider).change(function(){
         var oldChunkSize = settings.chunkSize;
+	clearInterval(state.interval);
         settings.chunkSize= $(elts.chunkSizeSlider).val();
-        clearInterval(state.interval);
         var newStateIdx= Math.floor((state.idx*oldChunkSize)/settings.chunkSize);
 	if (state.running == false) {
 	    $('#lb-pp').html(constants.pauseButton);
