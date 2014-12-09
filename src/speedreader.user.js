@@ -71,7 +71,7 @@ function processSelection () {
         range = selObj.getRangeAt(0);
     }
     state.rangeStr= range.toString();
-    $('#lb-pp').html(constants.pauseButton);
+    $(elts.ppButton).html(constants.pauseButton);
     speedRead(range.toString(), 0);
 }
 
@@ -89,7 +89,7 @@ function initWordArr(s){
 }
 
 function speedRead(s, startIdx) {
-    $('#lightbox').show();
+    $(elts.lightbox).show();
 
     state.wordArr = initWordArr(s);
 
@@ -117,11 +117,11 @@ function spanIt (div) {
 function goRead () {
     updateWpm();
     if (settings.centred) {
-	$("#lb-content").hide();
-        $("#lb-centred").show();
+	$(elts.content).hide();
+        $(elts.centred).show();
     } else {
-        $("#lb-centred").hide();
-        $("#lb-content").show();
+        $(elts.content).hide();
+        $(elts.centred).show();
     }
 
     var nodes = elts.content.childNodes;
@@ -146,30 +146,28 @@ function goRead () {
     	if (old==null){
             clearInterval(state.interval);
     	    state.interval = {};
-    	    // We want justified style on halt
-            $('#lb-centred').hide();
-    	    $('#lb-content').show();
-     	    //$('#lb-content').html(whiteSpan + wordArr.join(" ") + endSpan);
+
+    	    // We want justified style on halt - swap to block mode
+            $(elts.centred).hide();
+    	    $(elts.content).show();
+
 	    var nodes = elts.content.childNodes;
 	    var i = 0;
             for (i = 0; i < nodes.length; i++) {
                 $(nodes[i]).css("color", settings.highlight);
 	    }
-	    //$('.sprd-word').css("color", settings.highlight);
+
     	    state.running = false;
 
     	    // Reset idx and scroll
-    	    $("#lb-pp").html(constants.playButton);
+    	    $(elts.ppButton).html(constants.playButton);
     	    state.idx = 0;
         } else {
             if (!settings.centred) {
-                //$('#lb-content').html(wordArr.join(" "));
 		$(state.spans[pos]).css("color", settings.highlight);
 		$(state.spans[pos-1]).css("color", settings.lowlight);
             } else {
-		var whiteSpan= "<span id=\"curword\" style='color:white;'>";
-                var endSpan = "</span>";
-                $('#lb-centred').html(whiteSpan + wordArr[pos] + endSpan);
+                $(elts.centred).html(wordArr[pos]);
 	    }
 
 	    var cw = $(state.spans[pos]);
@@ -224,7 +222,7 @@ function setupHotkeys(){
         } else if (e.which == 27) {
             // esc
 	    pauseRead();
-            $('#lightbox').hide();
+            $(elts.lightbox).hide();
 	}
     }
 };
@@ -243,7 +241,6 @@ function lightboxStyle() {
 	"display"         : "none",
     });
     var contentStyle = {
-        "color"        : settings.lowlight,
 	"min-height"   : "65%",
 	"max-width"    : "100%",
 	"max-height"   : "65%",
@@ -260,8 +257,11 @@ function lightboxStyle() {
 	"word-wrap"    : "break-word",
     };
     $(elts.content).css(contentStyle);
+    $(elts.content).css("color", settings.lowlight);
     $(elts.centred).css(contentStyle);
+    $(elts.centred).css("color", settings.highlight);
     // centred has a few minor differences...
+
     $(elts.centred).css("display", "none");
     $(elts.centred).css("text-align", "center");
     $(elts.centred).css("padding-top", "8em");
@@ -371,44 +371,36 @@ function updateRemTime(){
     min = Math.floor((remTime/1000/60) << 0);
     //sec = Math.floor((remTime/1000) % 60);
     var remTimeStr= min + "m";
-    $('#lb-timeRem').html(remTimeStr);
+    $(elts.timeRem).html(remTimeStr);
 }
 function updateWpm() {
-    $('#lb-wpmdisp').html(settings.wpm + "WPM/" + settings.chunkSize);
+    $(elts.wpmDisp).html(settings.wpm + "WPM/" + settings.chunkSize);
 }
 function lightboxOverlay() {
     elts.lightbox = document.createElement("div");
 
     //content
-    elts.lightbox.setAttribute("id", "lightbox");
     elts.content = document.createElement("div");
-    elts.content.setAttribute("id", "lb-content");
     elts.lightbox.appendChild(elts.content);
 
 
     elts.centred = document.createElement("div");
-    elts.centred.setAttribute("id", "lb-centred");
     elts.lightbox.appendChild(elts.centred);
 
     //controls
     elts.controls = document.createElement("div");
-    elts.controls.setAttribute("id", "lb-controls-inner");
     elts.ppButton = document.createElement("div");
     elts.ppButton.innerHTML = constants.pauseButton;
-    elts.ppButton.setAttribute("id", "lb-pp");
 
     elts.controlCnt = document.createElement("div");
-    elts.controlCnt.setAttribute("id", "lb-controls");
 
     //wpm slider
     elts.wmpSpan= document.createElement("div");
-    elts.wmpSpan.setAttribute("id","wmpSpan");
     elts.wmpLabel = document.createElement("label");
     $(elts.wmpLabel).text("WPM");
     elts.wmpSpan.appendChild(elts.wmpLabel);
 
     elts.wpmVal = document.createElement("input");
-    elts.wpmVal.setAttribute("id","lb-wpm");
     elts.wpmVal.setAttribute("type","range");
     elts.wpmVal.setAttribute("min",100);
     elts.wpmVal.setAttribute("max",2000);
@@ -427,12 +419,10 @@ function lightboxOverlay() {
 
     //chunk size
     elts.chunkSpan= document.createElement("div");
-    elts.chunkSpan.setAttribute("id","chunkSpan");
     elts.chunkLabel = document.createElement("label");
     $(elts.chunkLabel).text("Chunk");
 
     elts.chunkSizeSlider = document.createElement("input");
-    elts.chunkSizeSlider.setAttribute("id","lb-chunks");
     elts.chunkSizeSlider.setAttribute("type","range");
     elts.chunkSizeSlider.setAttribute("min",1);
     elts.chunkSizeSlider.setAttribute("max",5);
@@ -444,7 +434,7 @@ function lightboxOverlay() {
         settings.chunkSize= $(elts.chunkSizeSlider).val();
         var newStateIdx= Math.floor((state.idx*oldChunkSize)/settings.chunkSize);
 	if (state.running == false) {
-	    $('#lb-pp').html(constants.pauseButton);
+	    $(elts.ppButton).html(constants.pauseButton);
 	}
         speedRead(state.rangeStr, newStateIdx);
     });
@@ -456,7 +446,6 @@ function lightboxOverlay() {
     // mode
     elts.modeButton = document.createElement("span");
     elts.modeButton.innerHTML = constants.unCentered;
-    elts.modeButton.setAttribute("id", "lb-mode");
 
     elts.modeButton.setAttribute("title", "View Mode");
     elts.lightbox.appendChild(elts.modeButton);
@@ -465,13 +454,11 @@ function lightboxOverlay() {
 
     // time remaining
     elts.timeRem = document.createElement("span");
-    elts.timeRem.setAttribute("id","lb-timeRem");
     updateRemTime();
     elts.lightbox.appendChild(elts.timeRem);
 
     // WPM display
     elts.wpmDisp = document.createElement("span");
-    elts.wpmDisp.setAttribute("id", "lb-wpmdisp");
     updateWpm();
     elts.lightbox.appendChild(elts.wpmDisp);
 
@@ -479,7 +466,6 @@ function lightboxOverlay() {
     elts.exButton = document.createElement("span");
     elts.exButton.innerHTML = constants.exitButton;
     elts.exButton.setAttribute("title", "Close");
-    elts.exButton.setAttribute("id", "lb-exit");
     elts.lightbox.appendChild(elts.exButton);
 }
 
@@ -489,7 +475,7 @@ function lightbox () {
     lightboxStyle();
     document.body.appendChild(elts.lightbox);
 
-    $('#lb-exit').on("click", function() {
+    $(elts.exButton).on("click", function() {
 	pauseRead();
 	document.body.removeChild(elts.lightbox);
     });
@@ -497,29 +483,29 @@ function lightbox () {
     var pp = function() {
         if(state.running) {
 	    pauseRead();
-	    $('#lb-pp').html(constants.playButton);
+	    $(elts.ppButton).html(constants.playButton);
 	} else {
             goRead();
-	    $('#lb-pp').html(constants.pauseButton);
+	    $(elts.ppButton).html(constants.pauseButton);
 	}
     };
 
     var chm = function() {
         if(settings.centred) {
-            $("#lb-centred").hide();
-	    $("#lb-content").show();
+            $(elts.centred).hide();
+	    $(elts.content).show();
 	    settings.centred = false;
-	    $("#lb-mode").html(constants.unCentered);
+	    $(elts.modeButton).html(constants.unCentered);
 	} else {
-	    $("#lb-content").hide();
-	    $("#lb-centred").show();
+	    $(elts.content).hide();
+	    $(elts.centred).show();
 	    settings.centred = true;
-	    $("#lb-mode").html(constants.centered);
+	    $(elts.modeButton).html(constants.centered);
 	}
     }
 
-    $('#lb-pp').on("click", pp);
-    $('#lb-content').on("click", pp);
-    $('#lb-centred').on("click", pp);
-    $('#lb-mode').on("click", chm);
+    $(elts.ppButton).on("click", pp);
+    $(elts.content).on("click", pp);
+    $(elts.centred).on("click", pp);
+    $(elts.modeButton).on("click", chm);
 }
