@@ -16,7 +16,7 @@ var settings = {
     lowlight: "#151515",
     buttonColor: "#DDD",
     buttonHover: "#FFF",
-    panelColor: "#333",
+    panelColor: "#151515",
 };
 
 var constants= {
@@ -24,6 +24,7 @@ var constants= {
     engAvgWordLen: 5.1,
     pauseButton: '\u275A \u275A',
     playButton: '\u25B6',
+    repeatButton: '\u27f2',
     unCentered: '\u2261',
     centered: '\u2012',
     exitButton: '\u00d7',
@@ -58,8 +59,6 @@ var elts = {
     exButton: null,
 }
 
-lightbox();
-
 function processSelection () {
     var selObj = window.getSelection();
     var range;
@@ -71,8 +70,12 @@ function processSelection () {
         range = selObj.getRangeAt(0);
     }
     state.rangeStr= range.toString();
+
+    lightbox();
+
     $(elts.ppButton).html(constants.pauseButton);
     speedRead(range.toString(), 0);
+    goRead();
 }
 
 function initWordArr(s){
@@ -95,7 +98,6 @@ function speedRead(s, startIdx) {
 
     spanIt(elts.content);
     state.idx = startIdx;
-    goRead ();
 }
 
 function spanIt (div) {
@@ -115,13 +117,16 @@ function spanIt (div) {
 }
 
 function goRead () {
+    $(elts.ppButton).html(constants.pauseButton);
+    elts.ppButton.setAttribute("title", "Pause playback");
+
     updateWpm();
     if (settings.centred) {
 	$(elts.content).hide();
         $(elts.centred).show();
     } else {
-        $(elts.content).hide();
-        $(elts.centred).show();
+        $(elts.centred).hide();
+        $(elts.content).show();
     }
 
     var nodes = elts.content.childNodes;
@@ -160,7 +165,7 @@ function goRead () {
     	    state.running = false;
 
     	    // Reset idx and scroll
-    	    $(elts.ppButton).html(constants.playButton);
+    	    $(elts.ppButton).html(constants.repeatButton);
     	    state.idx = 0;
         } else {
             if (!settings.centred) {
@@ -203,6 +208,8 @@ function pauseRead () {
     clearInterval(state.interval);
     state.interval = {};
     state.running = false;
+    $(elts.ppButton).html(constants.playButton);
+    elts.ppButton.setAttribute("title", "Resume playback");
 }
 
 document.onReady = setupHotkeys();
@@ -219,12 +226,10 @@ function setupHotkeys(){
         if(e.which == 81 && isCtrl == true) {
             processSelection();
             return false;
-        } else if (e.which == 27) {
-            // esc
-	    pauseRead();
-            $(elts.lightbox).hide();
+        } else if (e.which == 27) { // esc
+            exit();
 	}
-    }
+    };
 };
 
 function lightboxStyle() {
@@ -260,8 +265,8 @@ function lightboxStyle() {
     $(elts.content).css("color", settings.lowlight);
     $(elts.centred).css(contentStyle);
     $(elts.centred).css("color", settings.highlight);
-    // centred has a few minor differences...
 
+    // centred has a few minor differences...
     $(elts.centred).css("display", "none");
     $(elts.centred).css("text-align", "center");
     $(elts.centred).css("padding-top", "8em");
@@ -289,6 +294,7 @@ function lightboxStyle() {
 	"color"          : settings.buttonColor,
 	"letter-spacing" : "-0.15",
 	"cursor"         : "pointer",
+	"word-break"     : "keep-all",
     });
     $(elts.ppButton).hover(
         function () { $(elts.ppButton).css("color", settings.buttonHover); },
@@ -310,9 +316,9 @@ function lightboxStyle() {
 
     $(elts.controlCnt).css({
         "position"     : "fixed",
-	"botton"       : "3em",
+	"bottom"       : "3em",
 	"width"        : "50%",
-	"max-height"   : "15%",
+	"max-height"   : "50%",
 	"margin-left"  : "25%",
 	"margin-right" : "25%",
     });
@@ -323,7 +329,7 @@ function lightboxStyle() {
 	"margin-right" : "auto",
 	"background-color" : settings.panelColor,
 	"border-radius": "0.5em",
-	"column-count" : "3",
+	"overflow"     : "hidden",
     });
 
     $(elts.timeRem).css({
@@ -352,30 +358,39 @@ function lightboxStyle() {
     };
     $(elts.wmpSpan).css(sliders);
     $(elts.wmpSpan).css("float", "left");
+
     $(elts.chunkSpan).css(sliders);
     $(elts.chunkSpan).css("float", "right");
+
     $(elts.wmpSpan).find("label").css({
 	"padding-top" : "auto",
 	"padding-bottom" : "1em",
+	"float"          : "left",
+	"max-width"      : "15%",
     });
+    $(elts.wpmVal).css("max-width", "70%");
+    $(elts.chunkSizeSlider).css("max-width", "70%");
     $(elts.chunkSpan).find("label").css({
 	"padding-top" : "auto",
 	"padding-bottom" : "1em",
+	"float"          : "right",
+	"max-width"      : "50%",
     });
 }
 
 function updateRemTime(){
     var remIndexes= (state.wordArr.length-(state.idx));
-    // alert(remIndexes);
     var remTime= getWordTime()*settings.chunkSize*remIndexes;
     min = Math.floor((remTime/1000/60) << 0);
     //sec = Math.floor((remTime/1000) % 60);
-    var remTimeStr= min + "m";
+    var remTimeStr = min + "m";
     $(elts.timeRem).html(remTimeStr);
 }
+
 function updateWpm() {
     $(elts.wpmDisp).html(settings.wpm + "WPM/" + settings.chunkSize);
 }
+
 function lightboxOverlay() {
     elts.lightbox = document.createElement("div");
 
@@ -391,6 +406,7 @@ function lightboxOverlay() {
     elts.controls = document.createElement("div");
     elts.ppButton = document.createElement("div");
     elts.ppButton.innerHTML = constants.pauseButton;
+    elts.ppButton.setAttribute("title", "Pause playback");
 
     elts.controlCnt = document.createElement("div");
 
@@ -433,10 +449,8 @@ function lightboxOverlay() {
 	clearInterval(state.interval);
         settings.chunkSize= $(elts.chunkSizeSlider).val();
         var newStateIdx= Math.floor((state.idx*oldChunkSize)/settings.chunkSize);
-	if (state.running == false) {
-	    $(elts.ppButton).html(constants.pauseButton);
-	}
         speedRead(state.rangeStr, newStateIdx);
+	if (state.running) goRead();
     });
     elts.chunkSpan.appendChild(elts.chunkSizeSlider);
     elts.chunkSpan.appendChild(elts.chunkLabel);
@@ -469,43 +483,42 @@ function lightboxOverlay() {
     elts.lightbox.appendChild(elts.exButton);
 }
 
+function exit () {
+    pauseRead();
+    document.body.removeChild(elts.lightbox);
+    // TODO: Might need to re-add keybinds to avoid GC
+}
+
+function changeMode () {
+    if(settings.centred) {
+        $(elts.centred).hide();
+        $(elts.content).show();
+        settings.centred = false;
+        $(elts.modeButton).html(constants.unCentered);
+    } else {
+        $(elts.content).hide();
+        $(elts.centred).show();
+        settings.centred = true;
+        $(elts.modeButton).html(constants.centered);
+	// We need to make sure all highlighted words are reverted
+	// ... this should cover all possible callback orderings
+        $(state.spans[state.idx]).css("color", settings.lowlight);
+        $(state.spans[state.idx-1]).css("color", settings.lowlight);
+    }
+}
+
 function lightbox () {
     lightboxOverlay();
 
     lightboxStyle();
     document.body.appendChild(elts.lightbox);
 
-    $(elts.exButton).on("click", function() {
-	pauseRead();
-	document.body.removeChild(elts.lightbox);
-    });
+    $(elts.exButton).on("click", exit);
 
-    var pp = function() {
-        if(state.running) {
-	    pauseRead();
-	    $(elts.ppButton).html(constants.playButton);
-	} else {
-            goRead();
-	    $(elts.ppButton).html(constants.pauseButton);
-	}
-    };
-
-    var chm = function() {
-        if(settings.centred) {
-            $(elts.centred).hide();
-	    $(elts.content).show();
-	    settings.centred = false;
-	    $(elts.modeButton).html(constants.unCentered);
-	} else {
-	    $(elts.content).hide();
-	    $(elts.centred).show();
-	    settings.centred = true;
-	    $(elts.modeButton).html(constants.centered);
-	}
-    }
+    var pp = function() { state.running ? pauseRead() : goRead() };
 
     $(elts.ppButton).on("click", pp);
     $(elts.content).on("click", pp);
     $(elts.centred).on("click", pp);
-    $(elts.modeButton).on("click", chm);
+    $(elts.modeButton).on("click", changeMode);
 }
