@@ -454,7 +454,7 @@ function lightboxOverlay() {
 
     // mode
     elts.modeButton = document.createElement("span");
-    elts.modeButton.innerHTML = constants.centered;
+    elts.modeButton.innerHTML = constants.unCentered;
 
     elts.modeButton.setAttribute("title", "View Mode");
     elts.lightbox.appendChild(elts.modeButton);
@@ -517,3 +517,6 @@ function lightbox () {
     $(elts.centred).on("click", pp);
     $(elts.modeButton).on("click", changeMode);
 }
+self.port.on("READ", function(fname) {
+    processSelection();
+});
