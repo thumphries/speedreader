@@ -1,4 +1,4 @@
 *.xpi
 *addon-sdk
-dist
+dist/*
 *#

@@ -1,12 +1,15 @@
-// ==UserScript==
-// @name       Speed Reader
-// @namespace  http://github.com/shelf/speedreader
-// @version    0.1
-// @require    http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @description  Fascinating speed reading tool
-// @match      *
-// @copyright  2014+, T. Humphries, S. Ruji
-// ==/UserScript==
+var constants= {
+    msInSec: 60000,
+    engAvgWordLen: 5.1,
+    pauseButton: '\u275A \u275A',
+    playButton: '\u25B6',
+    repeatButton: '\u27f2',
+    unCentered: '\u2261',
+    centered: '\u2012',
+    exitButton: '\u00d7',
+    fontfamSerif: "Georgia, serif",
+    fontfamSansSerif: "arial, sans-serif",
+};
 
 var settings = {
     wpm: 400,
@@ -17,17 +20,7 @@ var settings = {
     buttonColor: "#DDD",
     buttonHover: "#FFF",
     panelColor: "#151515",
-};
-
-var constants= {
-    msInSec: 60000,
-    engAvgWordLen: 5.1,
-    pauseButton: '\u275A \u275A',
-    playButton: '\u25B6',
-    repeatButton: '\u27f2',
-    unCentered: '\u2261',
-    centered: '\u2012',
-    exitButton: '\u00d7',
+    font: constants.fontfamSansSerif,
 };
 
 var state = {
@@ -240,10 +233,11 @@ function lightboxStyle() {
 	"width"           : "100%",
 	"height"          : "100%",
 	"background-color": "black",
-	"font"            : "12px arial, sans-serif",
 	"overflow"        : "hidden",
-	"z-index"         : "9999999",
+	"z-index"         : "2147483647", // 32-bit signed max
 	"display"         : "none",
+	"font-family"     : constants.fontfamSansSerif,
+	"font-size"       : "0.8em",
     });
     var contentStyle = {
 	"min-height"   : "65%",
@@ -260,6 +254,7 @@ function lightboxStyle() {
 	"overflow-y"   : "scroll",
 	"overflow-x"   : "hidden",
 	"word-wrap"    : "break-word",
+	"font-family"  : settings.font,
     };
     $(elts.content).css(contentStyle);
     $(elts.content).css("color", settings.lowlight);
